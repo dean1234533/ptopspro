@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1600px;
+    height: 2560px;
+    overflow: hidden;
+    background: #0a0a0a;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    position: relative;
+  }
+
+  /* Background texture — diagonal lines */
+  .bg-lines {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 60px,
+      rgba(255,255,255,0.015) 60px,
+      rgba(255,255,255,0.015) 61px
+    );
+  }
+
+  /* Top accent bar */
+  .top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: linear-gradient(90deg, #1d4ed8, #3b82f6, #1d4ed8);
+  }
+
+  /* Bottom accent bar */
+  .bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: linear-gradient(90deg, #1d4ed8, #3b82f6, #1d4ed8);
+  }
+
+  /* Left vertical accent */
+  .left-accent {
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 80px;
+    width: 4px;
+    background: linear-gradient(180deg, #1d4ed8, #3b82f6 40%, #1d4ed8);
+  }
+
+  /* Main content area */
+  .content {
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 108px;
+    right: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 100px 60px 80px 80px;
+  }
+
+  /* Top section */
+  .top-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .series-tag {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #3b82f6;
+    margin-bottom: 60px;
+  }
+
+  .title {
+    font-size: 148px;
+    font-weight: 900;
+    line-height: 0.95;
+    color: #ffffff;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    margin-bottom: 50px;
+  }
+
+  .title span.mobile {
+    display: block;
+  }
+
+  .title span.pt {
+    display: block;
+    color: #3b82f6;
+  }
+
+  .title span.manifesto {
+    display: block;
+    font-size: 100px;
+  }
+
+  /* Divider rule */
+  .rule {
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #1e3a8a, transparent);
+    margin: 50px 0;
+  }
+
+  .subtitle {
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #9ca3af;
+    font-style: italic;
+    max-width: 900px;
+    margin-bottom: 0;
+  }
+
+  /* Middle visual element — large background number */
+  .bg-number {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 800px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.025);
+    line-height: 1;
+    letter-spacing: -0.1em;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Key promise section */
+  .promises {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    margin: 0;
+  }
+
+  .promise-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+  }
+
+  .promise-dot {
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    background: #3b82f6;
+    margin-top: 14px;
+  }
+
+  .promise-text {
+    font-size: 32px;
+    font-weight: 600;
+    color: #d1d5db;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  /* Bottom section — author */
+  .bottom-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .author-rule {
+    width: 100px;
+    height: 3px;
+    background: #3b82f6;
+    margin-bottom: 4px;
+  }
+
+  .author-label {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+
+  .author-name {
+    font-size: 48px;
+    font-weight: 700;
+    color: #e5e7eb;
+    letter-spacing: -0.01em;
+  }
+
+  .author-title {
+    font-size: 24px;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: -4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-lines"></div>
+<div class="top-bar"></div>
+<div class="bottom-bar"></div>
+<div class="left-accent"></div>
+
+<!-- Background decorative number -->
+<div class="bg-number">£</div>
+
+<div class="content">
+
+  <!-- TOP: Title block -->
+  <div class="top-section">
+    <div class="series-tag">Mobile PT London</div>
+
+    <div class="title">
+      <span class="mobile">The</span>
+      <span class="pt">Mobile PT</span>
+      <span class="manifesto">Manifesto</span>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="subtitle">
+      How to Escape the Gym Rent Trap and Build a Profitable London Fitness Business
+    </div>
+  </div>
+
+  <!-- MIDDLE: Three key promises -->
+  <div class="promises">
+    <div class="promise-item">
+      <div class="promise-dot"></div>
+      <div class="promise-text">Why gym chains are designed to keep you broke</div>
+    </div>
+    <div class="promise-item">
+      <div class="promise-dot"></div>
+      <div class="promise-text">The e-bike strategy that earns £3,000 before 9 AM</div>
+    </div>
+    <div class="promise-item">
+      <div class="promise-dot"></div>
+      <div class="promise-text">The complete business system — forms, tools, templates</div>
+    </div>
+  </div>
+
+  <!-- BOTTOM: Author -->
+  <div class="bottom-section">
+    <div class="author-rule"></div>
+    <div class="author-label">Author</div>
+    <div class="author-name">Dean Burt</div>
+    <div class="author-title">Mobile Personal Trainer, London</div>
+  </div>
+
+</div>
+
+</body>
+</html>

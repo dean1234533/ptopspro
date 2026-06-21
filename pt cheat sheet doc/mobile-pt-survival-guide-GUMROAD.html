@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile PT Survival Guide — Urban London Edition</title>
+<style>
+/* ── PAGE SETUP ── */
+@page {
+  size: A4 portrait;
+  margin: 24mm 22mm 28mm 24mm;
+}
+@page { /* page numbers via margin box */
+  @bottom-center {
+    content: counter(page);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 8pt;
+    color: #9ca3af;
+    letter-spacing: 0.1em;
+    vertical-align: middle;
+  }
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* ── BASE TYPOGRAPHY ── */
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 11pt;
+  line-height: 1.72;
+  color: #111827;
+  background: #fff;
+  text-align: justify;
+  hyphens: auto;
+  widows: 3;
+  orphans: 3;
+}
+
+/* ── COVER ── */
+.cover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+  padding: 18mm 0 14mm;
+  background: #0f172a;
+  color: #fff;
+  /* extend to bleed beyond @page margins */
+  margin: -24mm -22mm -28mm -24mm;
+  padding-left: 32mm;
+  padding-right: 24mm;
+  padding-top: 26mm;
+  padding-bottom: 20mm;
+  position: relative;
+  overflow: hidden;
+}
+.cover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #1d4ed8, #60a5fa, #1d4ed8);
+}
+.cover-tag {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #60a5fa;
+  margin-bottom: 14mm;
+}
+.cover h1 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 54pt;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-transform: uppercase;
+  text-align: left;
+  margin-bottom: 6mm;
+}
+.cover h2 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12pt;
+  font-weight: 400;
+  color: #94a3b8;
+  font-style: italic;
+  text-align: left;
+  border: none;
+  padding: 0;
+  margin-bottom: 0;
+  margin-top: 5mm;
+}
+.cover-rule {
+  width: 50mm;
+  height: 2px;
+  background: linear-gradient(90deg, #1d4ed8, transparent);
+  margin: 8mm 0;
+}
+.cover-intro {
+  font-family: Georgia, serif;
+  font-size: 10pt;
+  line-height: 1.7;
+  color: #94a3b8;
+  font-style: italic;
+  max-width: 120mm;
+  text-align: left;
+}
+.cover-byline {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 9.5pt;
+  color: #e2e8f0;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: left;
+}
+
+/* ── TABLE OF CONTENTS ── */
+.toc {
+  page-break-after: always;
+  padding-top: 10mm;
+}
+.toc h2 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 8mm;
+  border-bottom: 0.75pt solid #e5e7eb;
+  padding-bottom: 3mm;
+  text-align: left;
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc-n;
+  padding: 0;
+}
+.toc ol li {
+  counter-increment: toc-n;
+  display: flex;
+  align-items: baseline;
+  gap: 4mm;
+  padding: 3.5mm 0;
+  border-bottom: 0.5pt dotted #d1d5db;
+  font-family: Georgia, serif;
+  font-size: 10.5pt;
+}
+.toc ol li::before {
+  content: "0" counter(toc-n);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  color: #1d4ed8;
+  min-width: 8mm;
+}
+
+/* ── CHAPTER OPENERS ── */
+.chapter {
+  page-break-before: always;
+  padding-top: 8mm;
+}
+.chapter-number {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #1d4ed8;
+  margin-bottom: 3mm;
+}
+h1 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 22pt;
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+  text-align: left;
+  margin-bottom: 2mm;
+  page-break-after: avoid;
+}
+.chapter-subtitle {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10pt;
+  font-weight: 400;
+  font-style: italic;
+  color: #6b7280;
+  text-align: left;
+  margin-bottom: 5mm;
+}
+hr.chapter-rule {
+  border: none;
+  border-top: 2pt solid #0f172a;
+  margin: 5mm 0 7mm;
+}
+
+/* ── SECTION HEADINGS ── */
+h2 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12pt;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: left;
+  border-bottom: 1.5pt solid #0f172a;
+  padding-bottom: 2mm;
+  margin-top: 8mm;
+  margin-bottom: 4mm;
+  letter-spacing: -0.01em;
+  page-break-after: avoid;
+}
+h3 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10.5pt;
+  font-weight: 700;
+  font-style: italic;
+  color: #374151;
+  margin-top: 6mm;
+  margin-bottom: 3mm;
+  text-align: left;
+  page-break-after: avoid;
+}
+h2 + p, h3 + p, h1 + p { page-break-before: avoid; }
+
+/* ── BODY ── */
+p { margin-bottom: 5pt; }
+strong { font-weight: 700; }
+em { font-style: italic; }
+ul, ol { margin: 4pt 0 7pt 18pt; padding: 0; }
+li { margin-bottom: 3pt; page-break-inside: avoid; }
+
+/* ── OPENING QUOTE ── */
+blockquote.opening {
+  border-left: 3pt solid #0f172a;
+  padding: 4mm 5mm;
+  margin: 6mm 0;
+  font-size: 10.5pt;
+  font-style: italic;
+  color: #374151;
+  background: #f8fafc;
+  page-break-inside: avoid;
+}
+blockquote.opening strong { font-style: normal; color: #0f172a; }
+
+/* ── PRO TIP ── */
+.pro-tip {
+  background: #eff6ff;
+  border-left: 3pt solid #1d4ed8;
+  padding: 4mm 5mm;
+  margin: 6mm 0;
+}
+.pro-tip::before {
+  display: block;
+  content: "PRO TIP";
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #1d4ed8;
+  margin-bottom: 2mm;
+}
+.pro-tip p { margin: 0; font-size: 10.5pt; color: #1e3a8a; }
+
+/* ── WARNING ── */
+.warning {
+  background: #fff7ed;
+  border-left: 3pt solid #ea580c;
+  padding: 4mm 5mm;
+  margin: 6mm 0;
+}
+.warning p { margin: 0; font-size: 10.5pt; color: #7c2d12; }
+
+/* ── TABLES ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 5mm 0 7mm;
+  font-size: 9.5pt;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  page-break-inside: avoid;
+}
+thead tr { background: #0f172a; }
+thead th {
+  padding: 2.5mm 4mm;
+  text-align: left;
+  font-weight: 700;
+  font-size: 8pt;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+tbody tr:nth-child(even) { background: #f8fafc; }
+tbody td {
+  padding: 2.5mm 4mm;
+  border-bottom: 0.5pt solid #e5e7eb;
+  vertical-align: top;
+}
+
+/* ── FINAL WORD & COLOPHON ── */
+.final-word { page-break-before: always; padding-top: 8mm; }
+.final-word h2 {
+  font-size: 14pt;
+  font-weight: 900;
+  border-bottom: 2pt solid #0f172a;
+}
+.colophon {
+  margin-top: 14mm;
+  padding-top: 4mm;
+  border-top: 0.5pt solid #e5e7eb;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 8pt;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.8;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ COVER ═══════════ -->
+<div class="cover">
+  <div class="cover-tag">Mobile Personal Training — Urban London Edition</div>
+  <h1>Mobile PT<br>Survival Guide</h1>
+  <h2>No Fluff. No Excuses.</h2>
+  <div class="cover-rule"></div>
+  <p class="cover-intro">
+    This guide is for trainers who want to build a real business, not a side hustle that slowly kills
+    them. Read every word. The trainers who ignore this lose money for years before figuring it out
+    on their own.
+  </p>
+  <div class="cover-byline">By Dean Burt &nbsp;·&nbsp; Mobile PT, London</div>
+</div>
+
+<!-- ═══════════ TABLE OF CONTENTS ═══════════ -->
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li>The "Gym Trap" Warning</li>
+    <li>The Independent vs. Freelance Roadmap</li>
+    <li>The E-Bike Logistics Strategy</li>
+    <li>Weather &amp; Gear Protocol</li>
+    <li>Park &amp; Public Space Rules</li>
+    <li>The PT Playbook — Quick Reference Cheat Sheet</li>
+  </ol>
+</div>
+
+<!-- ═══════════ CHAPTER 1 ═══════════ -->
+<div class="chapter">
+  <div class="chapter-number">Chapter 01</div>
+  <h1>The "Gym Trap" Warning</h1>
+  <p class="chapter-subtitle">Why Big-Box Gyms Will Eat You Alive</p>
+  <hr class="chapter-rule">
+
+  <p>The pitch sounds perfect: guaranteed footfall, changing rooms, equipment included, visible location. The reality is a business model designed to extract maximum labour from you at minimum cost to them.</p>
+
+  <p>Here is exactly what happens when you take a floor role at <strong>The Gym Group</strong>, <strong>PureGym</strong>, or any similar chain:</p>
+
+  <h3>The Shift Reality</h3>
+  <ul>
+    <li>You are expected to be on the floor from <strong>open to close</strong> during your assigned shift — routinely 12+ hours.</li>
+    <li>The majority of that time is not spent training clients. It is spent doing gym floor walks, cleaning equipment, folding towels, greeting members, and filling in incident logs.</li>
+    <li>You are not paid for this time. You are "building your client base."</li>
+  </ul>
+
+  <h3>The Rent Clawback Model</h3>
+  <ul>
+    <li>The gym grants you the right to sell PT sessions on their floor. In exchange, you pay them <strong>monthly rent</strong>, often disguised as a "licence fee" — typically £200–£600/month depending on location.</li>
+    <li>If you do not generate enough PT revenue to cover the rent, <strong>they deduct it directly from your session income</strong>. You can work a full month and owe the gym money.</li>
+    <li>Clawback clauses mean your income is always negative first. You are funding their business model before yours.</li>
+  </ul>
+
+  <h3>What You Lose</h3>
+  <ul>
+    <li>Full days of your life standing on a rubber floor achieving nothing billable.</li>
+    <li>The ability to take clients outside, to locations they prefer, to build <em>your</em> brand.</li>
+    <li>Any flexibility — your schedule is theirs.</li>
+    <li>Your self-respect, eventually.</li>
+  </ul>
+
+  <div class="warning">
+    <p><strong>Who it works for (briefly):</strong> A newly qualified trainer with zero clients and no idea how to generate leads might benefit from the initial footfall exposure for 3–6 months maximum. Get in, get 5 anchor clients, and get out.</p>
+  </div>
+
+  <div class="pro-tip">
+    <p>If a gym offers you a "free desk" or "free access" in exchange for working their floor, treat it as a time-limited lead generation exercise — never as a business model. Set a hard exit date of 90 days before you walk through the door.</p>
+  </div>
+</div>
+
+<!-- ═══════════ CHAPTER 2 ═══════════ -->
+<div class="chapter">
+  <div class="chapter-number">Chapter 02</div>
+  <h1>The Independent vs. Freelance Roadmap</h1>
+  <p class="chapter-subtitle">Self-Employed Is the Destination. Use the Platforms as Stepping Stones.</p>
+  <hr class="chapter-rule">
+
+  <p>The goal is simple: <strong>100% of your income comes from clients who found you, trust you, and pay you directly.</strong> No middleman, no platform fee, no one who can remove you from a leaderboard or cut your leads.</p>
+
+  <p>Getting there requires building something they cannot take from you: a reputation and a client base.</p>
+
+  <h2>The Two Platforms Worth Your Time</h2>
+
+  <h3>Ourparks</h3>
+  <p>A platform that connects mobile/outdoor PTs with clients in parks and public spaces across London. Useful for early visibility, first reviews, and getting comfortable training outdoors. The platform takes a cut — accept this temporarily. Join, fulfil sessions professionally, collect testimonials, then convert clients to direct payment off-platform once trust is established (check their T&Cs — most have a 12-month clause).</p>
+
+  <h3>Motivate PT</h3>
+  <p>A higher-quality lead generation service. The leads they pass are vetted, often corporate, and willing to pay premium rates. Useful for accelerating your early client base and accessing clients you could not reach through Instagram or word-of-mouth alone. Again — a temporary tool, not a permanent dependency.</p>
+
+  <h2>The Fully Independent Model (Your End Goal)</h2>
+
+  <table>
+    <thead>
+      <tr><th>Income Source</th><th>Dependence</th><th>Risk</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Gym floor role</td><td>High</td><td>Clawback, zero flexibility</td></tr>
+      <tr><td>Platform PT (Ourparks / Motivate)</td><td>Medium</td><td>Platform can de-list you</td></tr>
+      <tr><td>Direct clients (your own)</td><td>None</td><td>You control everything</td></tr>
+    </tbody>
+  </table>
+
+  <h3>How to transition clients off-platform</h3>
+  <ol>
+    <li>Build trust through consistent results and communication.</li>
+    <li>Make yourself irreplaceable — not the platform.</li>
+    <li>When the exclusivity clause expires, offer direct booking with a small discount (5–10%) as the incentive.</li>
+  </ol>
+
+  <h3>What to never do</h3>
+  <ul>
+    <li>Sign an exclusivity agreement with any single gym, park operator, or platform.</li>
+    <li>Allow a platform to hold your client contacts without you maintaining an independent record.</li>
+    <li>Build your entire marketing around one platform's algorithm.</li>
+  </ul>
+
+  <div class="pro-tip">
+    <p>Register as a sole trader with HMRC from day one. Keep every receipt. Use a business bank account (Monzo Business is free). The moment you have 3+ paying direct clients, stop relying on any platform as your primary source of income.</p>
+  </div>
+</div>
+
+<!-- ═══════════ CHAPTER 3 ═══════════ -->
+<div class="chapter">
+  <div class="chapter-number">Chapter 03</div>
+  <h1>The E-Bike Logistics Strategy</h1>
+  <p class="chapter-subtitle">The Most Profitable Business Decision You Will Make This Year</p>
+  <hr class="chapter-rule">
+
+  <p>Every trainer eventually faces the same question: <em>how do I get between clients efficiently in London?</em></p>
+  <p>The wrong answers: car, motorcycle, public transport.<br>
+  The right answer: <strong>electric bike (e-bike)</strong>, and the math is not close.</p>
+
+  <h2>The Hidden Costs of the Alternatives</h2>
+
+  <table>
+    <thead>
+      <tr><th>Transport</th><th>Monthly Cost (London estimate)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Car (insurance, tax, fuel, parking, fines, congestion charge)</td><td>£600–£1,200</td></tr>
+      <tr><td>Motorcycle (insurance, fuel, parking, fines)</td><td>£300–£600</td></tr>
+      <tr><td>Public transport (zones 1–3, Oyster)</td><td>£180–£250</td></tr>
+      <tr><td><strong>E-bike (amortised purchase + occasional charge)</strong></td><td><strong>£15–£30</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p>A car in London means:</p>
+  <ul>
+    <li><strong>Congestion Charge:</strong> £15/day if you're in Zone 1 — that's £300/month for 20 working days.</li>
+    <li><strong>Parking:</strong> £3–£10/hour near residential areas. You cannot park outside a client's house for free.</li>
+    <li><strong>Traffic:</strong> A 3-mile journey can take 45 minutes during rush hour. Your 5:30 AM client and 6:30 AM client suddenly have a 45-minute gap that earns you nothing.</li>
+    <li><strong>PCNs:</strong> One parking fine wipes out a session's income. Most trainers average 2–4 fines per month before they wise up.</li>
+  </ul>
+
+  <h2>The E-Bike Advantage</h2>
+  <ul>
+    <li>Travel 3 miles in <strong>12–15 minutes</strong>, regardless of rush hour, every time.</li>
+    <li>Lock it anywhere. No parking fees. No congestion charge. No fuel.</li>
+    <li>Carry your full kit in a quality rear rack bag.</li>
+    <li>Arrive on time, every time. Punctuality is a marketing strategy.</li>
+    <li>40–60 miles per charge — more than enough for any working day.</li>
+  </ul>
+
+  <h2>Session Density Math</h2>
+
+  <p><strong>Without an e-bike (public transport):</strong><br>
+  5:30 AM client → travel 25 min → 7:00 AM client. <strong>Maximum 2 morning sessions.</strong></p>
+
+  <p><strong>With an e-bike:</strong><br>
+  5:30 AM client → travel 12 min → 6:30 AM client → travel 12 min → 7:30 AM client. <strong>3 morning sessions, same area.</strong></p>
+
+  <p>At £50/session, that is the difference between <strong>£100 and £150 every single morning.</strong> Over 20 working mornings: <strong>£1,000 more per month</strong> from logistics alone.</p>
+
+  <h3>E-Bike Investment</h3>
+  <ul>
+    <li>Budget: £800–£1,500 for a reliable second-hand model (Cowboy, Raleigh, quality conversion).</li>
+    <li>Payback period at 1 extra session/day: <strong>less than 2 months.</strong></li>
+    <li>It is not a purchase. It is an income-generating asset.</li>
+  </ul>
+
+  <div class="pro-tip">
+    <p>Insure your e-bike (Laka or Bikmo — approximately £8–£15/month). Theft in London is real. A stolen e-bike without insurance means losing your logistics infrastructure overnight.</p>
+  </div>
+</div>
+
+<!-- ═══════════ CHAPTER 4 ═══════════ -->
+<div class="chapter">
+  <div class="chapter-number">Chapter 04</div>
+  <h1>Weather &amp; Gear Protocol</h1>
+  <p class="chapter-subtitle">The "All-Weather" Mindset Is Your Competitive Advantage</p>
+  <hr class="chapter-rule">
+
+  <p>Most trainers cancel in the rain. Their clients reschedule, momentum breaks, habits die, and the client churns within 8 weeks. You will not be that trainer.</p>
+
+  <blockquote class="opening">
+    Bad weather is not an obstacle. It is a filter that removes your weaker competitors from the market. A client who trains in November rain with you builds a different loyalty than one who trains in an air-conditioned gym. They tell people about it. <strong>That is your marketing.</strong>
+  </blockquote>
+
+  <h2>Required Waterproof Apparel (Non-Negotiable)</h2>
+
+  <table>
+    <thead>
+      <tr><th>Item</th><th>Spec</th><th>Why</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Jacket</strong></td>
+        <td>Gore-Tex or equivalent (seam-sealed)</td>
+        <td>A "water-resistant" shell fails in 15 minutes of real rain. Gore-Tex lasts the session.</td>
+      </tr>
+      <tr>
+        <td><strong>Trousers</strong></td>
+        <td>Waterproof overtrousers</td>
+        <td>Standing on wet grass for 60 minutes soaks through softshell. Waterproof trousers keep you functional.</td>
+      </tr>
+      <tr>
+        <td><strong>Shoes</strong></td>
+        <td>Gore-Tex trail shoes (Salomon or equivalent)</td>
+        <td>Wet feet in an hour-long session are a health hazard and a distraction. Non-negotiable.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>You cannot project confidence and authority while visibly soaking and uncomfortable. Your appearance is part of your professionalism.</p>
+
+  <h2>Essential Kit List</h2>
+  <ul>
+    <li><strong>Mat</strong> — Warm-up, cool-down, core work, stretching. Buy quality (at least 6mm). A cheap mat that slips on wet grass is a liability.</li>
+    <li><strong>Resistance bands (light / medium / heavy set)</strong> — Full-body resistance anywhere. Fits in a small pouch. No excuse not to carry all three.</li>
+    <li><strong>Suspension trainer (TRX or equivalent)</strong> — Attach to a tree, fence, or railing. Unlocks 50+ bodyweight exercises. The most space-efficient piece of kit you own.</li>
+    <li><strong>Jump rope</strong> — A 5-minute rope circuit replaces a treadmill. Takes up zero space.</li>
+    <li><strong>Interval timer</strong> — Structure commands respect. A session without a timer is a conversation with exercise in it.</li>
+    <li><strong>Boxing pads and gloves</strong> — The single best ice-breaker tool in outdoor PT. A new client who is nervous and self-conscious will throw a punch and immediately relax. It creates a story they tell their friends. <strong>This is your referral engine.</strong></li>
+  </ul>
+
+  <h2>Cold and Rain Protocols</h2>
+  <ul>
+    <li>Shorten rest periods by 30% — keeps core temperature up and the session feeling tight.</li>
+    <li>Start with a 5-minute dynamic warm-up minimum — cold muscles in cold weather are injury risk.</li>
+    <li>Have a covered backup location identified for every regular session area (a café awning, a bandstand, a covered market). Rain does not cancel. Standing water and lightning do.</li>
+  </ul>
+
+  <div class="pro-tip">
+    <p>Keep a fully packed kit bag ready at all times. If you are packing your bag at 5:00 AM for a 5:30 AM session, you will forget something, rush, and arrive flustered. The bag is packed the night before, every night. This is a system, not a habit.</p>
+  </div>
+</div>
+
+<!-- ═══════════ CHAPTER 5 ═══════════ -->
+<div class="chapter">
+  <div class="chapter-number">Chapter 05</div>
+  <h1>Park &amp; Public Space Rules</h1>
+  <p class="chapter-subtitle">Know the Rules Before They Remove You</p>
+  <hr class="chapter-rule">
+
+  <p>London has some of the best outdoor training spaces in the world. It also has rules that are enforced, and ignorance is not an accepted defence.</p>
+
+  <h2>Royal Parks — Do Not Train Here Without Authorisation</h2>
+
+  <p>The eight Royal Parks (Hyde Park, Regent's Park, Greenwich Park, Richmond Park, etc.) require <strong>explicit written authorisation</strong> to conduct commercial personal training. This is not a grey area.</p>
+
+  <div class="warning">
+    <p><strong>What happens if you train commercially without a permit:</strong> You will be approached by a Royal Parks Officer. You will be given a warning or removed immediately. If you persist, you face a formal notice and potential legal action. One expulsion in front of a client is a reputational event you do not recover from easily.</p>
+  </div>
+
+  <p>The permit process exists but is competitive, costly, and capped. Most PTs are rejected or placed on a waiting list. <strong>The risk is not worth it.</strong></p>
+
+  <h2>Where You Can Train (Safely and Legally)</h2>
+
+  <ul>
+    <li><strong>Council-managed parks and recreation grounds</strong> — The vast majority of London's green spaces are managed by local councils, not the Crown. Training exists in a legal grey area, but enforcement is rare if you are not using permanent equipment, blocking paths, or operating large group classes.</li>
+    <li><strong>How to confirm:</strong> Email your local borough's parks department. Ask specifically whether commercial PT is permitted. Get the answer in writing. This takes 10 minutes and protects you indefinitely.</li>
+    <li><strong>Approved partner spaces:</strong> Ourparks has pre-negotiated access agreements with specific sites. If you are on the platform, these spaces are cleared for you.</li>
+  </ul>
+
+  <h2>Practical Rules for Any Public Space</h2>
+  <ul>
+    <li>Do not occupy the same spot for so long that you block public access.</li>
+    <li>Do not anchor equipment permanently (no stakes, no fixed ropes).</li>
+    <li>Do not play amplified music without checking local bylaws.</li>
+    <li>Pick up everything. Leave the space exactly as you found it.</li>
+  </ul>
+
+  <div class="pro-tip">
+    <p>Build a list of 3–5 safe, council-approved training locations within your operating area. Know a backup for each one. A waterlogged pitch or an event takeover will happen, and your session cannot depend on one location.</p>
+  </div>
+</div>
+
+<!-- ═══════════ CHAPTER 6 — CHEAT SHEET ═══════════ -->
+<div class="chapter">
+  <div class="chapter-number">Chapter 06</div>
+  <h1>The PT Playbook</h1>
+  <p class="chapter-subtitle">Quick Reference Cheat Sheet — The Non-Negotiables, All in One Place</p>
+  <hr class="chapter-rule">
+
+  <h2>Finances</h2>
+  <ul>
+    <li><strong>Never accept cash.</strong> Bank transfer or card only.</li>
+    <li><strong>Prepayment is mandatory.</strong> Sessions are paid before they happen. No payment = no booking confirmed.</li>
+    <li><strong>24-hour cancellation policy.</strong> Late cancellations pay in full. Enforce it from the first session.</li>
+    <li><strong>Invoice every client monthly.</strong> Use Wave or FreshBooks (free tier). HMRC self-assessment is your responsibility.</li>
+    <li><strong>Set your prices and do not apologise for them.</strong> Discount for volume (pair sessions, block bookings) — not for individuals who "can't really afford it."</li>
+  </ul>
+
+  <h2>Scheduling</h2>
+  <ul>
+    <li><strong>Prioritise 5:30 AM and 7:00 PM slots.</strong> Pre-work and post-work clients are the most committed and the least likely to cancel.</li>
+    <li><strong>Avoid midday slots as your primary income.</strong> That client base changes. Early and late commuters do not.</li>
+    <li><strong>Build session clusters by geography.</strong> Three clients in the same postcode at 6, 7, and 8 AM is vastly more profitable than three clients across three boroughs.</li>
+    <li><strong>Build in 15-minute travel buffers.</strong> Arriving flustered is arriving unprepared.</li>
+    <li><strong>Keep one full day off per week.</strong> Burnout is real, accelerated by the physical nature of the job.</li>
+  </ul>
+
+  <h2>Marketing</h2>
+  <ul>
+    <li><strong>Target female clients as your primary demographic.</strong> Statistically, female clients in the 25–45 bracket exhibit higher retention, stronger referral behaviour, and more consistent attendance. This is a market reality.</li>
+    <li><strong>Document progress with video.</strong> At weeks 4, 8, and 12, record a short movement comparison (with written consent). A 30-second before/after clip is your most powerful marketing asset.</li>
+    <li><strong>Ask for a Google review after week 4</strong> — not at the end of a 12-week block. Week 4 is when motivation is highest and reviews are best.</li>
+    <li><strong>One social proof post per week minimum.</strong> Consistency beats quality.</li>
+    <li><strong>Google My Business is mandatory.</strong> A complete listing with 5+ reviews makes you appear in "personal trainer near me" searches. This is free local SEO and it works.</li>
+  </ul>
+
+  <h2>Growth</h2>
+  <ul>
+    <li><strong>Pair session discounts.</strong> Two clients, same time, same location = 80% of solo rate each. You earn 60% more per hour.</li>
+    <li><strong>NHS / key worker discount (10–15%).</strong> These communities talk to each other. One NHS nurse with a great experience sends five colleagues.</li>
+    <li><strong>Referral incentive.</strong> A free session for every client who sends you a paying referral.</li>
+    <li><strong>Block booking discount.</strong> 10 sessions prepaid at 10% off. Improves your cash flow, locks in commitment.</li>
+    <li><strong>Annual review conversations.</strong> At 6 and 12 months, discuss new goals. Clients who have new goals stay. Clients who feel they have "finished" leave.</li>
+  </ul>
+
+  <h2>Essential Forms (Mandatory Before First Session)</h2>
+
+  <table>
+    <thead>
+      <tr><th>Form</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>PAR-Q</strong></td><td>Physical Activity Readiness Questionnaire. Identifies contraindications. Signed copy required.</td></tr>
+      <tr><td><strong>Health Screening</strong></td><td>Medical history, medications, injuries, lifestyle. Programming brief and liability document.</td></tr>
+      <tr><td><strong>Informed Consent / Liability Waiver</strong></td><td>Client acknowledges exercise risk. Does not remove your duty of care, but establishes informed participation.</td></tr>
+      <tr><td><strong>Goal-Setting / Enquiry Form</strong></td><td>Goals, timeline, training history, availability, budget. Your programming brief.</td></tr>
+      <tr><td><strong>Progress Photo / Video Consent</strong></td><td>Explicit written consent. Never post without this signed.</td></tr>
+      <tr><td><strong>Terms &amp; Conditions / Cancellation Policy</strong></td><td>Payment terms, cancellation policy, refund position. Signed at intake. Enforced throughout.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pro-tip">
+    <p>Keep digital copies of all signed forms in a dedicated, password-protected folder (Google Drive works). Paper forms get lost. A client dispute without a signed PAR-Q is a legal nightmare. A client dispute with one is a 10-minute conversation.</p>
+  </div>
+</div>
+
+<!-- ═══════════ FINAL WORD ═══════════ -->
+<div class="final-word">
+  <h2>Final Word</h2>
+  <p>The trainers who fail in this industry do so for three reasons: they undercharge, they underdeliver operationally (late, disorganised, unprepared), or they hand control of their business to a gym or a platform.</p>
+  <p>The trainers who build something real solve all three problems in their first year. They price confidently, they run their sessions like a professional service, and they own every client relationship.</p>
+  <p>This guide covers the operational reality.</p>
+  <p><strong>The rest is reps.</strong></p>
+
+  <div class="colophon">
+    <p>Mobile PT Survival Guide — Urban London Edition</p>
+    <p>For trainers who are serious about building a business, not just a job.</p>
+    <p style="margin-top:0.5rem;">© Dean Burt — All rights reserved</p>
+  </div>
+</div>
+
+</body>
+</html>

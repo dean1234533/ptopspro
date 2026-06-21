@@ -1,0 +1,12 @@
+node_modules/
+dist/
+release/
+.firebase/
+.env.local
+.env.*.local
+functions/.secret.local
+functions/node_modules/
+*.log
+.DS_Store
+.vscode/
+.idea/

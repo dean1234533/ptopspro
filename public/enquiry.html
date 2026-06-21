@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Free Consultation</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#030712;--surface:#0f172a;--border:#1e293b;--input:#111827;--label:#94a3b8;--text:#f1f5f9;--muted:#64748b;--accent:#6366f1;--accent2:#818cf8;--success:#10b981;--error:#ef4444}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.5}
+body{display:flex;justify-content:center;align-items:flex-start;padding:40px 16px 80px}
+.card{width:100%;max-width:520px}
+.brand{font-size:18px;font-weight:700;letter-spacing:-0.02em;margin-bottom:32px}
+.page-title{font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+.field{margin-bottom:20px}
+label{display:block;font-size:13px;font-weight:600;color:var(--label);margin-bottom:7px}
+label .req{color:var(--error);margin-left:2px}
+input[type=text],input[type=email],input[type=tel],select,textarea{width:100%;background:var(--input);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;padding:12px 14px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none;font-family:inherit}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+select option{background:#111827}
+textarea{resize:vertical;min-height:100px}
+.avail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.avail-option{position:relative}
+.avail-option input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+.avail-option label{display:flex;align-items:center;gap:9px;background:var(--input);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;font-size:14px;font-weight:500;color:var(--label);transition:border-color .15s,background .15s,color .15s;user-select:none;margin:0;letter-spacing:0}
+.avail-option label::before{content:'';width:16px;height:16px;min-width:16px;border:1.5px solid var(--border);border-radius:4px;background:var(--surface);transition:background .15s,border-color .15s}
+.avail-option input:checked+label{border-color:var(--accent);background:rgba(99,102,241,.08);color:var(--text)}
+.avail-option input:checked+label::before{background:var(--accent);border-color:var(--accent);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath stroke='%23fff' stroke-width='1.8' fill='none' d='M1 4l3 3 5-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
+.submit-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:600;cursor:pointer;letter-spacing:-0.01em;transition:background .15s,transform .1s;margin-top:8px}
+.submit-btn:hover{background:var(--accent2)}
+.submit-btn:active{transform:scale(.99)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.alert{display:none;border-radius:10px;padding:14px 16px;font-size:14px;font-weight:500;margin-top:16px;line-height:1.5}
+.alert.success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
+.alert.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.alert.show{display:block}
+.privacy{margin-top:20px;font-size:12px;color:var(--muted);text-align:center;line-height:1.6}
+.invalid-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.invalid-state h2{color:var(--text);font-size:20px;margin-bottom:8px}
+@media(max-width:420px){.avail-grid{grid-template-columns:1fr}.page-title{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="card" id="app">
+  <div class="invalid-state" id="invalid" style="display:none">
+    <h2>Invalid link</h2>
+    <p>This link appears to be broken. Ask your trainer for the correct enquiry link.</p>
+  </div>
+  <div id="main" style="display:none">
+    <div class="brand" id="brand-name"></div>
+    <h1 class="page-title">Book a Free Consultation</h1>
+    <p class="page-sub" id="page-sub"></p>
+    <form id="f">
+      <input type="hidden" name="pt_email" id="pt_email">
+      <input type="hidden" name="pt_name"  id="pt_name">
+      <input type="text"   name="_honey"   style="display:none" tabindex="-1" autocomplete="off">
+      <div class="field"><label for="name">Full Name <span class="req">*</span></label><input type="text" id="name" name="name" placeholder="Jane Smith" required autocomplete="name"></div>
+      <div class="field"><label for="phone">Phone</label><input type="tel" id="phone" name="phone" placeholder="07700 900000" autocomplete="tel"></div>
+      <div class="field"><label for="email">Email <span class="req">*</span></label><input type="email" id="email" name="email" placeholder="jane@example.com" required autocomplete="email"></div>
+      <div class="field"><label for="goal">Primary Goal</label><select id="goal" name="goal"><option value="" disabled selected>Select a goal...</option><option>Fat loss &amp; body composition</option><option>Strength &amp; muscle building</option><option>General fitness &amp; energy</option><option>Posture &amp; mobility</option><option>Sport-specific training</option><option>Post-injury rehabilitation</option><option>Stress relief &amp; mental health</option><option>Running &amp; endurance</option><option>Pre/postnatal fitness</option><option>Other</option></select></div>
+      <div class="field">
+        <label>Availability <span style="font-weight:400;color:var(--muted)">(select all that apply)</span></label>
+        <div class="avail-grid">
+          <div class="avail-option"><input type="checkbox" id="av1" name="availability" value="Early morning (5:30 AM)"><label for="av1">Early morning (5:30 AM)</label></div>
+          <div class="avail-option"><input type="checkbox" id="av2" name="availability" value="Morning (7–9 AM)"><label for="av2">Morning (7–9 AM)</label></div>
+          <div class="avail-option"><input type="checkbox" id="av3" name="availability" value="Midday (12–2 PM)"><label for="av3">Midday (12–2 PM)</label></div>
+          <div class="avail-option"><input type="checkbox" id="av4" name="availability" value="Evening (6–8 PM)"><label for="av4">Evening (6–8 PM)</label></div>
+          <div class="avail-option"><input type="checkbox" id="av5" name="availability" value="Weekends"><label for="av5">Weekends</label></div>
+          <div class="avail-option"><input type="checkbox" id="av6" name="availability" value="Flexible"><label for="av6">Flexible</label></div>
+        </div>
+      </div>
+      <div class="field"><label for="notes">Anything else?</label><textarea id="notes" name="notes" placeholder="Injuries, experience level, location preferences..."></textarea></div>
+      <button type="submit" class="submit-btn" id="btn">Send Enquiry</button>
+      <div class="alert success" id="ok">✓ &nbsp;Sent! Your trainer will be in touch within 24 hours.</div>
+      <div class="alert error"   id="err">Something went wrong — please try again.</div>
+    </form>
+    <p class="privacy">Your details are used only to respond to your enquiry.<br>No spam. No third-party sharing.</p>
+  </div>
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var raw    = params.get('for');
+
+  if (!raw) { show('invalid'); return; }
+
+  var pt;
+  try { pt = JSON.parse(atob(raw)); } catch { show('invalid'); return; }
+  if (!pt || !pt.e) { show('invalid'); return; }
+
+  document.getElementById('pt_email').value = pt.e;
+  document.getElementById('pt_name').value  = pt.n || '';
+  document.getElementById('brand-name').textContent = pt.n || 'Personal Training';
+  document.getElementById('page-sub').textContent =
+    (pt.a ? 'Mobile personal training — ' + pt.a + '.' : 'Mobile personal training — outdoor sessions.');
+
+  show('main');
+
+  var f   = document.getElementById('f');
+  var btn = document.getElementById('btn');
+  var ok  = document.getElementById('ok');
+  var err = document.getElementById('err');
+
+  f.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    ok.classList.remove('show');
+    err.classList.remove('show');
+
+    var avail = Array.from(f.querySelectorAll('[name=availability]:checked')).map(function(c){return c.value;});
+    var body = {
+      pt_email:     f.pt_email.value,
+      pt_name:      f.pt_name.value,
+      name:         f.name.value,
+      phone:        f.phone.value,
+      email:        f.email.value,
+      goal:         f.goal.value,
+      availability: avail,
+      notes:        f.notes.value,
+    };
+
+    try {
+      var r = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (r.ok) {
+        f.reset();
+        ok.classList.add('show');
+        btn.textContent = 'Sent ✓';
+      } else { throw new Error(); }
+    } catch {
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Send Enquiry';
+    }
+  });
+
+  function show(id) {
+    document.getElementById('invalid').style.display = id === 'invalid' ? '' : 'none';
+    document.getElementById('main').style.display    = id === 'main'    ? '' : 'none';
+  }
+})();
+</script>
+</body>
+</html>

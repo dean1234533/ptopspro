@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <defs>
+    <linearGradient id="tbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a0f"/>
+      <stop offset="100%" stop-color="#0f0f1a"/>
+    </linearGradient>
+    <linearGradient id="tacc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="tglow" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#4f46e5" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="tblur">
+      <feGaussianBlur stdDeviation="30"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="400" fill="url(#tbg)" rx="12"/>
+
+  <!-- Glow -->
+  <ellipse cx="300" cy="200" rx="280" ry="180" fill="url(#tglow)" filter="url(#tblur)"/>
+
+  <!-- Grid lines -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/>
+    <line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/>
+    <line x1="150" y1="0" x2="150" y2="400"/>
+    <line x1="300" y1="0" x2="300" y2="400"/>
+    <line x1="450" y1="0" x2="450" y2="400"/>
+  </g>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="600" height="4" fill="url(#tacc)" rx="2"/>
+
+  <!-- Left accent stripe -->
+  <rect x="40" y="72" width="3" height="160" fill="url(#tacc)" rx="1.5"/>
+
+  <!-- Lightning bolt (small, decorative) -->
+  <g transform="translate(490, 80)" opacity="0.8">
+    <polygon points="-22,45 8,-6 3,-6 22,-45 -8,6 -3,6" fill="url(#tacc)"/>
+  </g>
+
+  <!-- Title -->
+  <text x="55" y="118" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="44" font-weight="900" fill="#ffffff" letter-spacing="-2">MOBILE PT</text>
+  <text x="55" y="168" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="44" font-weight="900" fill="#ffffff" letter-spacing="-2">SURVIVAL</text>
+  <text x="55" y="218" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="44" font-weight="900" fill="url(#tacc)" letter-spacing="-2">GUIDE</text>
+
+  <!-- Divider -->
+  <rect x="55" y="232" width="220" height="2" fill="url(#tacc)" rx="1"/>
+
+  <!-- Subtitle -->
+  <text x="55" y="262" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="14" font-weight="500" fill="#6b7280" letter-spacing="2">URBAN LONDON EDITION</text>
+
+  <!-- Tags row -->
+  <rect x="55" y="288" width="120" height="28" rx="14"
+        fill="#4f46e5" fill-opacity="0.15" stroke="#4f46e5" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="115" y="307" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="11" font-weight="600" fill="#818cf8" text-anchor="middle">E-Bike Strategy</text>
+
+  <rect x="185" y="288" width="110" height="28" rx="14"
+        fill="#4f46e5" fill-opacity="0.15" stroke="#4f46e5" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="240" y="307" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="11" font-weight="600" fill="#818cf8" text-anchor="middle">Gym Trap Alert</text>
+
+  <rect x="305" y="288" width="120" height="28" rx="14"
+        fill="#4f46e5" fill-opacity="0.15" stroke="#4f46e5" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="365" y="307" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="11" font-weight="600" fill="#818cf8" text-anchor="middle">Gear Protocol</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="360" width="600" height="40" fill="#4f46e5" fill-opacity="0.06"/>
+  <rect x="0" y="396" width="600" height="4" fill="url(#tacc)"/>
+  <text x="55" y="386" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="11" font-weight="700" fill="#6b7280" letter-spacing="2">PT OPS DASHBOARD</text>
+  <text x="545" y="386" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="11" font-weight="700" fill="#4f46e5" text-anchor="end">2025</text>
+</svg>
