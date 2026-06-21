@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getSettings, saveSettings } from '../lib/storage';
 
 const EMPTY = { trainerName: '', businessName: '', serviceArea: '', trainerId: '' };
-const BASE_URL = 'https://ptopspro.vercel.app';
+const BASE_URL = 'https://ptopspro.vercel.app/enquiry.html';
 
 export function buildFormUrl(s) {
   if (!s || !s.trainerId) return null;
