@@ -196,7 +196,7 @@ export default function EnquiryForm() {
 
         <div>
           <p className="mb-2 text-xs font-medium text-gray-400">Availability (select all that apply)</p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {SLOTS.map(slot => (
               <button
                 key={slot}

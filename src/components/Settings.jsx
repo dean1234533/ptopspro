@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { getSettings, saveSettings } from '../lib/storage';
 
-const EMPTY = { trainerName: '', businessName: '', email: '', serviceArea: '' };
+const EMPTY = { trainerName: '', businessName: '', serviceArea: '', trainerId: '' };
 const BASE_URL = 'https://ptopspro.vercel.app';
 
 export function buildFormUrl(s) {
-  if (!s || !s.email) return null;
-  const payload = btoa(JSON.stringify({ n: s.businessName || s.trainerName, e: s.email, a: s.serviceArea }));
+  if (!s || !s.trainerId) return null;
+  const payload = btoa(JSON.stringify({ n: s.businessName || s.trainerName, a: s.serviceArea, id: s.trainerId }));
   return `${BASE_URL}?for=${payload}`;
 }
 
@@ -25,9 +25,12 @@ export default function Settings({ onClose }) {
 
   function handleSave(e) {
     e.preventDefault();
-    saveSettings(form);
+    const toSave = { ...form };
+    if (!toSave.trainerId) toSave.trainerId = crypto.randomUUID();
+    saveSettings(toSave);
+    setForm(toSave);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setTimeout(() => onClose(), 800);
   }
 
   return (
@@ -46,19 +49,13 @@ export default function Settings({ onClose }) {
         <form onSubmit={handleSave} className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-400">Your Name <span className="text-red-400">*</span></label>
-            <input name="trainerName" value={form.trainerName} onChange={handleChange} placeholder="Dean Burt" required
+            <input name="trainerName" value={form.trainerName} onChange={handleChange} placeholder="e.g. John Smith" required
               className="w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-400">Business / Trading Name</label>
-            <input name="businessName" value={form.businessName} onChange={handleChange} placeholder="Dean Burt PT"
+            <input name="businessName" value={form.businessName} onChange={handleChange} placeholder="e.g. John Smith PT"
               className="w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-400">Your Email <span className="text-red-400">*</span></label>
-            <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@email.com" required
-              className="w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
-            <p className="mt-1.5 text-xs text-gray-600">Client enquiries will be emailed here.</p>
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-400">Service Area</label>

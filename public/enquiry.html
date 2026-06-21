@@ -44,7 +44,7 @@ textarea{resize:vertical;min-height:100px}
 </style>
 </head>
 <body>
-<div class="card" id="app">
+<div class="card">
   <div class="invalid-state" id="invalid" style="display:none">
     <h2>Invalid link</h2>
     <p>This link appears to be broken. Ask your trainer for the correct enquiry link.</p>
@@ -54,9 +54,6 @@ textarea{resize:vertical;min-height:100px}
     <h1 class="page-title">Book a Free Consultation</h1>
     <p class="page-sub" id="page-sub"></p>
     <form id="f">
-      <input type="hidden" name="pt_email" id="pt_email">
-      <input type="hidden" name="pt_name"  id="pt_name">
-      <input type="text"   name="_honey"   style="display:none" tabindex="-1" autocomplete="off">
       <div class="field"><label for="name">Full Name <span class="req">*</span></label><input type="text" id="name" name="name" placeholder="Jane Smith" required autocomplete="name"></div>
       <div class="field"><label for="phone">Phone</label><input type="tel" id="phone" name="phone" placeholder="07700 900000" autocomplete="tel"></div>
       <div class="field"><label for="email">Email <span class="req">*</span></label><input type="email" id="email" name="email" placeholder="jane@example.com" required autocomplete="email"></div>
@@ -64,76 +61,87 @@ textarea{resize:vertical;min-height:100px}
       <div class="field">
         <label>Availability <span style="font-weight:400;color:var(--muted)">(select all that apply)</span></label>
         <div class="avail-grid">
-          <div class="avail-option"><input type="checkbox" id="av1" name="availability" value="Early morning (5:30 AM)"><label for="av1">Early morning (5:30 AM)</label></div>
-          <div class="avail-option"><input type="checkbox" id="av2" name="availability" value="Morning (7–9 AM)"><label for="av2">Morning (7–9 AM)</label></div>
-          <div class="avail-option"><input type="checkbox" id="av3" name="availability" value="Midday (12–2 PM)"><label for="av3">Midday (12–2 PM)</label></div>
-          <div class="avail-option"><input type="checkbox" id="av4" name="availability" value="Evening (6–8 PM)"><label for="av4">Evening (6–8 PM)</label></div>
-          <div class="avail-option"><input type="checkbox" id="av5" name="availability" value="Weekends"><label for="av5">Weekends</label></div>
-          <div class="avail-option"><input type="checkbox" id="av6" name="availability" value="Flexible"><label for="av6">Flexible</label></div>
+          <div class="avail-option"><input type="checkbox" id="av1" value="Early morning (5:30 AM)"><label for="av1">Early morning (5:30 AM)</label></div>
+          <div class="avail-option"><input type="checkbox" id="av2" value="Morning (7–9 AM)"><label for="av2">Morning (7–9 AM)</label></div>
+          <div class="avail-option"><input type="checkbox" id="av3" value="Midday (12–2 PM)"><label for="av3">Midday (12–2 PM)</label></div>
+          <div class="avail-option"><input type="checkbox" id="av4" value="Evening (6–8 PM)"><label for="av4">Evening (6–8 PM)</label></div>
+          <div class="avail-option"><input type="checkbox" id="av5" value="Weekends"><label for="av5">Weekends</label></div>
+          <div class="avail-option"><input type="checkbox" id="av6" value="Flexible"><label for="av6">Flexible</label></div>
         </div>
       </div>
       <div class="field"><label for="notes">Anything else?</label><textarea id="notes" name="notes" placeholder="Injuries, experience level, location preferences..."></textarea></div>
       <button type="submit" class="submit-btn" id="btn">Send Enquiry</button>
-      <div class="alert success" id="ok">✓ &nbsp;Sent! Your trainer will be in touch within 24 hours.</div>
+      <div class="alert success" id="ok">✓ &nbsp;Sent! Your trainer will be in touch soon.</div>
       <div class="alert error"   id="err">Something went wrong — please try again.</div>
     </form>
     <p class="privacy">Your details are used only to respond to your enquiry.<br>No spam. No third-party sharing.</p>
   </div>
 </div>
-<script>
-(function () {
-  var params = new URLSearchParams(window.location.search);
-  var raw    = params.get('for');
 
-  if (!raw) { show('invalid'); return; }
+<script type="module">
+  const FIREBASE_CONFIG = {
+    apiKey:            'AIzaSyATQQqFZeJgI4wXl3icI_KzUVDPEoh7Lno',
+    authDomain:        'pt-cheat-sheet.firebaseapp.com',
+    projectId:         'pt-cheat-sheet',
+    storageBucket:     'pt-cheat-sheet.firebasestorage.app',
+    messagingSenderId: '787783093048',
+    appId:             '1:787783093048:web:2c130854e93dd981ee0fcd',
+    measurementId:     'G-9XW8E21N9R',
+  };
 
-  var pt;
-  try { pt = JSON.parse(atob(raw)); } catch { show('invalid'); return; }
-  if (!pt || !pt.e) { show('invalid'); return; }
+  import { initializeApp }              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, collection, addDoc, serverTimestamp }
+                                        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-  document.getElementById('pt_email').value = pt.e;
-  document.getElementById('pt_name').value  = pt.n || '';
+  const app = initializeApp(FIREBASE_CONFIG);
+  const db  = getFirestore(app);
+
+  // Decode trainer info from URL
+  const params = new URLSearchParams(window.location.search);
+  const raw    = params.get('for');
+
+  if (!raw) { show('invalid'); throw new Error('no for param'); }
+
+  let pt;
+  try { pt = JSON.parse(atob(raw)); } catch { show('invalid'); throw new Error('bad param'); }
+  if (!pt || !pt.id) { show('invalid'); throw new Error('no trainer id'); }
+
   document.getElementById('brand-name').textContent = pt.n || 'Personal Training';
-  document.getElementById('page-sub').textContent =
-    (pt.a ? 'Mobile personal training — ' + pt.a + '.' : 'Mobile personal training — outdoor sessions.');
-
+  document.getElementById('page-sub').textContent   =
+    pt.a ? `Mobile personal training — ${pt.a}.` : 'Mobile personal training — outdoor sessions.';
   show('main');
 
-  var f   = document.getElementById('f');
-  var btn = document.getElementById('btn');
-  var ok  = document.getElementById('ok');
-  var err = document.getElementById('err');
+  const f   = document.getElementById('f');
+  const btn = document.getElementById('btn');
+  const ok  = document.getElementById('ok');
+  const err = document.getElementById('err');
 
-  f.addEventListener('submit', async function (e) {
+  f.addEventListener('submit', async e => {
     e.preventDefault();
     btn.disabled = true;
     btn.textContent = 'Sending…';
     ok.classList.remove('show');
     err.classList.remove('show');
 
-    var avail = Array.from(f.querySelectorAll('[name=availability]:checked')).map(function(c){return c.value;});
-    var body = {
-      pt_email:     f.pt_email.value,
-      pt_name:      f.pt_name.value,
-      name:         f.name.value,
-      phone:        f.phone.value,
-      email:        f.email.value,
-      goal:         f.goal.value,
-      availability: avail,
-      notes:        f.notes.value,
-    };
+    const availability = Array.from(document.querySelectorAll('.avail-option input:checked'))
+      .map(c => c.value);
 
     try {
-      var r = await fetch('/api/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+      await addDoc(collection(db, 'enquiries'), {
+        trainer_id:   pt.id,
+        name:         f.name.value.trim(),
+        phone:        f.phone.value.trim(),
+        email:        f.email.value.trim(),
+        goal:         f.goal.value,
+        availability,
+        notes:        f.notes.value.trim(),
+        status:       'new',
+        created_at:   serverTimestamp(),
       });
-      if (r.ok) {
-        f.reset();
-        ok.classList.add('show');
-        btn.textContent = 'Sent ✓';
-      } else { throw new Error(); }
+
+      f.reset();
+      ok.classList.add('show');
+      btn.textContent = 'Sent ✓';
     } catch {
       err.classList.add('show');
       btn.disabled = false;
@@ -145,7 +153,6 @@ textarea{resize:vertical;min-height:100px}
     document.getElementById('invalid').style.display = id === 'invalid' ? '' : 'none';
     document.getElementById('main').style.display    = id === 'main'    ? '' : 'none';
   }
-})();
 </script>
 </body>
 </html>
