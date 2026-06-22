@@ -2,8 +2,9 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/enquiry.html", "destination": "/enquiry.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/enquiry.html",  "destination": "/enquiry.html" },
+    { "source": "/api/(.*)",      "destination": "/api/$1" },
+    { "source": "/(.*)",          "destination": "/index.html" }
   ],
   "headers": [
     {
