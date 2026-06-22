@@ -102,13 +102,13 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (Notification.permission === 'default') Notification.requestPermission();
+    const canNotify = typeof Notification !== 'undefined';
+    if (canNotify && Notification.permission === 'default') Notification.requestPermission();
 
     function notify(rows) {
+      if (!canNotify || Notification.permission !== 'granted') return;
       rows.forEach(r => {
-        if (Notification.permission === 'granted') {
-          new Notification('New Enquiry — PT Ops Pro', { body: `${r.name} wants to book a consultation` });
-        }
+        new Notification('New Enquiry — PT Ops Pro', { body: `${r.name} wants to book a consultation` });
       });
     }
 
