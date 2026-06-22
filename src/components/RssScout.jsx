@@ -5,14 +5,15 @@ import { getStored, addRecord, updateRecord, deleteRecord, PROSPECTS_KEY } from 
 
 const SOURCES = ['Referral', 'Local Park', 'Social Media', 'Walk-in / Street', 'Google Maps', 'Event', 'Other'];
 
-const NEXT_STATUS  = { spotted: 'contacted', contacted: 'interested', interested: 'booked', booked: 'won', won: 'spotted' };
-const STATUS_LABEL = { spotted: 'Spotted', contacted: 'Contacted', interested: 'Interested', booked: 'Booked', won: 'Won' };
-const STATUS_STYLES = {
-  spotted:    'bg-gray-500/15 text-gray-400 ring-gray-500/25',
-  contacted:  'bg-amber-500/15 text-amber-400 ring-amber-500/25',
-  interested: 'bg-indigo-500/15 text-indigo-400 ring-indigo-500/25',
-  booked:     'bg-violet-500/15 text-violet-400 ring-violet-500/25',
-  won:        'bg-emerald-500/15 text-emerald-400 ring-emerald-500/25',
+const NEXT_STATUS    = { spotted: 'contacted', contacted: 'interested', interested: 'booked', booked: 'won', won: 'spotted' };
+const CURRENT_LABEL  = { spotted: 'Spotted', contacted: 'Contacted', interested: 'Interested', booked: 'Booked', won: 'Won' };
+const ACTION_LABEL   = { spotted: 'Contacted', contacted: 'Interested', interested: 'Booked', booked: 'Won', won: 'Re-spot' };
+const ACTION_STYLES  = {
+  spotted:    'bg-amber-500/15 text-amber-400 ring-amber-500/25 hover:bg-amber-500/25',
+  contacted:  'bg-indigo-500/15 text-indigo-400 ring-indigo-500/25 hover:bg-indigo-500/25',
+  interested: 'bg-violet-500/15 text-violet-400 ring-violet-500/25 hover:bg-violet-500/25',
+  booked:     'bg-emerald-500/15 text-emerald-400 ring-emerald-500/25 hover:bg-emerald-500/25',
+  won:        'bg-gray-500/15 text-gray-400 ring-gray-500/25 hover:bg-gray-500/25',
 };
 
 const FILTER_TABS = [
@@ -32,10 +33,11 @@ function StatusPill({ status, onClick }) {
   return (
     <button
       onClick={onClick}
-      title="Tap to advance status"
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ring-inset transition hover:opacity-80 ${STATUS_STYLES[status] ?? STATUS_STYLES.spotted}`}
+      title={`Mark as ${ACTION_LABEL[status]}`}
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ring-inset transition ${ACTION_STYLES[status] ?? ACTION_STYLES.spotted}`}
     >
-      {STATUS_LABEL[status] ?? status}
+      <span className="opacity-50">→</span>
+      {ACTION_LABEL[status] ?? 'Contacted'}
     </button>
   );
 }
@@ -62,6 +64,7 @@ function ProspectCard({ prospect, onOutreach, onDelete }) {
           <p className="truncate text-xs text-gray-500">{prospect.source || 'No source'}</p>
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
+          <span className="text-[10px] font-medium text-gray-600">{CURRENT_LABEL[prospect.status] ?? 'Spotted'}</span>
           <StatusPill status={prospect.status ?? 'spotted'} onClick={advance} />
           <button
             onClick={() => setOpen(o => !o)}
