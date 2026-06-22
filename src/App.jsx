@@ -87,7 +87,13 @@ export default function App() {
   const [activeTab,    setActiveTab]    = useState('playbook');
   const [showSettings, setShowSettings] = useState(() => !getSettings().trainerId);
   const [linkCopied,   setLinkCopied]  = useState(false);
+  const [installDismissed, setInstallDismissed] = useState(false);
   const updateAvailable = useUpdateCheck();
+
+  const isIOS       = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid   = /Android/.test(navigator.userAgent);
+  const isPWA       = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const showInstall = !isPWA && (isIOS || isAndroid) && !installDismissed;
 
   const [outreachForm, setOutreachForm] = useState({
     companyName: '', ownerName: '', websiteUrl: '', toEmail: '',
@@ -140,7 +146,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex min-h-dvh bg-gray-950">
+    <div className="flex min-h-screen bg-gray-950" style={{minHeight:'100dvh'}}>
 
       {/* ── Sidebar — md and up ────────────────────────────────────────────── */}
       <aside className="hidden md:flex md:w-56 md:flex-col md:fixed md:inset-y-0 md:z-30 md:border-r md:border-gray-800 md:bg-gray-950">
@@ -202,7 +208,7 @@ export default function App() {
       </aside>
 
       {/* ── Main area ──────────────────────────────────────────────────────── */}
-      <div className="flex min-h-dvh flex-1 flex-col md:ml-56">
+      <div className="flex min-h-screen flex-1 flex-col md:ml-56" style={{minHeight:'100dvh'}}>
 
         {/* Mobile top bar */}
         <header className="sticky top-0 z-20 border-b border-gray-800 bg-gray-950/95 backdrop-blur-sm md:hidden">
@@ -241,8 +247,21 @@ export default function App() {
           </div>
         )}
 
+        {/* Install banner */}
+        {showInstall && (
+          <div className="flex items-center justify-between gap-3 bg-gray-900 border-b border-gray-800 px-4 py-3">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-white">
+                {isIOS ? 'Tap Share → Add to Home Screen' : 'Add to Home Screen'}
+              </p>
+              <p className="text-[11px] text-gray-500">Get a full-screen app experience</p>
+            </div>
+            <button onClick={() => setInstallDismissed(true)} className="flex-shrink-0 text-gray-600 hover:text-gray-400 text-lg leading-none">✕</button>
+          </div>
+        )}
+
         {/* Page content */}
-        <main className="flex-1 px-4 pb-24 pt-4 md:px-8 md:pb-8 md:pt-6">
+        <main className="flex-1 px-4 pt-4 md:px-8 md:pb-8 md:pt-6" style={{paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))'}}>
           <div className="mx-auto w-full max-w-2xl">
             {activeTab === 'playbook'  && <Playbook />}
             {activeTab === 'outreach'  && <LeadDashboard formState={outreachForm} setFormState={setOutreachForm} />}
@@ -254,7 +273,7 @@ export default function App() {
         </main>
 
         {/* Mobile bottom nav */}
-        <nav className="fixed bottom-0 left-0 right-0 z-20 border-t border-gray-800 bg-gray-950/95 backdrop-blur-sm md:hidden">
+        <nav className="fixed bottom-0 left-0 right-0 z-20 border-t border-gray-800 bg-gray-950/95 backdrop-blur-sm md:hidden" style={{paddingBottom:'env(safe-area-inset-bottom)'}}>
           <div className="flex">
             {TABS.map(tab => (
               <button

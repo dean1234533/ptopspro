@@ -128,16 +128,15 @@ textarea{resize:vertical;min-height:100px}
       .map(c => c.value);
 
     try {
-      await addDoc(collection(db, 'enquiries'), {
-        trainer_id:   pt.id,
+      await addDoc(collection(db, 'trainers', pt.id, 'enquiries'), {
         name:         f.name.value.trim(),
         phone:        f.phone.value.trim(),
         email:        f.email.value.trim(),
         goal:         f.goal.value,
         availability,
-        notes:        f.notes.value.trim(),
+        message:      f.notes.value.trim(),
         status:       'new',
-        created_at:   serverTimestamp(),
+        createdAt:    new Date().toISOString(),
       });
 
       f.reset();
