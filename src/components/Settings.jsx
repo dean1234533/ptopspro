@@ -4,8 +4,9 @@ import { getSettings, saveSettings } from '../lib/storage';
 const EMPTY = { trainerName: '', businessName: '', serviceArea: '', trainerId: '' };
 export function buildFormUrl(s) {
   if (!s || !s.trainerId) return null;
-  const base = `${window.location.origin}/enquiry.html`;
-  return `${base}?id=${s.trainerId}`;
+  // Always use the current domain — works on any host
+  const origin = window.location.origin;
+  return `${origin}/enquiry.html?id=${s.trainerId}`;
 }
 
 function Toggle({ on, onToggle }) {
