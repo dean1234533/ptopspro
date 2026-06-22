@@ -56,8 +56,8 @@ export default function AuthScreen() {
   const inputClass = 'w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500';
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-5 py-12" style={{minHeight:'100dvh'}}>
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen overflow-y-auto bg-gray-950 px-5" style={{minHeight:'100dvh'}}>
+      <div className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center py-12" style={{minHeight:'100dvh'}}>
 
         {/* Logo */}
         <div className="mb-8 flex items-center gap-2.5">
