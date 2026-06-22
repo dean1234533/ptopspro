@@ -79,6 +79,9 @@ textarea{resize:vertical;min-height:100px}
 </div>
 
 <script type="module">
+  import { initializeApp }                                    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, getDoc, doc, collection, addDoc }   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
   const FIREBASE_CONFIG = {
     apiKey:            'AIzaSyATQQqFZeJgI4wXl3icI_KzUVDPEoh7Lno',
     authDomain:        'pt-cheat-sheet.firebaseapp.com',
@@ -89,27 +92,35 @@ textarea{resize:vertical;min-height:100px}
     measurementId:     'G-9XW8E21N9R',
   };
 
-  import { initializeApp }              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getFirestore, collection, addDoc, serverTimestamp }
-                                        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  function show(id) {
+    document.getElementById('invalid').style.display = id === 'invalid' ? '' : 'none';
+    document.getElementById('main').style.display    = id === 'main'    ? '' : 'none';
+  }
 
   const app = initializeApp(FIREBASE_CONFIG);
   const db  = getFirestore(app);
 
-  // Decode trainer info from URL
+  // Resolve trainer ID — supports permanent ?id= link and legacy ?for= links
   const params = new URLSearchParams(window.location.search);
-  const raw    = params.get('for');
+  let trainerId = params.get('id');
+  if (!trainerId && params.get('for')) {
+    try { trainerId = JSON.parse(atob(params.get('for'))).id; } catch {}
+  }
 
-  if (!raw) { show('invalid'); throw new Error('no for param'); }
+  if (!trainerId) { show('invalid'); throw new Error('no id'); }
 
-  let pt;
-  try { pt = JSON.parse(atob(raw)); } catch { show('invalid'); throw new Error('bad param'); }
-  if (!pt || !pt.id) { show('invalid'); throw new Error('no trainer id'); }
+  // Fetch trainer's public profile from Firestore
+  const snap = await getDoc(doc(db, 'trainers', trainerId)).catch(() => null);
+  const pt   = snap && snap.exists() ? snap.data() : {};
 
   document.getElementById('page-title').textContent =
-    pt.n ? `Book a Free Consultation with ${pt.n}` : 'Book a Free Consultation';
+    (pt.businessName || pt.trainerName)
+      ? `Book a Free Consultation with ${pt.businessName || pt.trainerName}`
+      : 'Book a Free Consultation';
   document.getElementById('page-sub').textContent =
-    pt.a ? `Mobile personal training — ${pt.a}.` : 'Mobile personal training — outdoor sessions.';
+    pt.serviceArea
+      ? `Mobile personal training — ${pt.serviceArea}.`
+      : 'Mobile personal training — outdoor sessions.';
   show('main');
 
   const f   = document.getElementById('f');
@@ -128,7 +139,7 @@ textarea{resize:vertical;min-height:100px}
       .map(c => c.value);
 
     try {
-      await addDoc(collection(db, 'trainers', pt.id, 'enquiries'), {
+      await addDoc(collection(db, 'trainers', trainerId, 'enquiries'), {
         name:         f.name.value.trim(),
         phone:        f.phone.value.trim(),
         email:        f.email.value.trim(),
@@ -148,11 +159,6 @@ textarea{resize:vertical;min-height:100px}
       btn.textContent = 'Send Enquiry';
     }
   });
-
-  function show(id) {
-    document.getElementById('invalid').style.display = id === 'invalid' ? '' : 'none';
-    document.getElementById('main').style.display    = id === 'main'    ? '' : 'none';
-  }
 </script>
 </body>
 </html>

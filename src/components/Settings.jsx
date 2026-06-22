@@ -6,8 +6,7 @@ const BASE_URL = 'https://ptopspro.vercel.app/enquiry.html';
 
 export function buildFormUrl(s) {
   if (!s || !s.trainerId) return null;
-  const payload = btoa(JSON.stringify({ n: s.businessName || s.trainerName, a: s.serviceArea, id: s.trainerId }));
-  return `${BASE_URL}?for=${payload}`;
+  return `${BASE_URL}?id=${s.trainerId}`;
 }
 
 function Toggle({ on, onToggle }) {
@@ -61,7 +60,20 @@ export default function Settings({ onClose }) {
     saveSettings({ ...getSettings(), notifyVibrate: next });
   }
 
-  function copyLink(url) {
+  async function shareLink(url) {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Book a Free PT Consultation',
+          text: 'Book a free consultation with me — fill in your details and I\'ll be in touch.',
+          url,
+        });
+        return;
+      } catch(e) {
+        if (e.name === 'AbortError') return; // user cancelled
+      }
+    }
+    // Fallback: clipboard copy
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -117,10 +129,10 @@ export default function Settings({ onClose }) {
               </code>
               <button
                 type="button"
-                onClick={() => copyLink(formUrl)}
+                onClick={() => shareLink(formUrl)}
                 className="flex-shrink-0 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500"
               >
-                {copied ? 'Copied!' : 'Copy'}
+                {copied ? 'Copied!' : 'Share'}
               </button>
             </div>
           </div>
