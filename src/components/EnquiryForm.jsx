@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { addRecord, ENQUIRIES_KEY, getSettings } from '../lib/storage';
+import { useState, useEffect } from 'react';
+import { addRecord, ENQUIRIES_KEY, getSettings, SETTINGS_KEY } from '../lib/storage';
 import { buildFormUrl } from './Settings';
 
 const GOALS = [
@@ -28,7 +28,18 @@ export default function EnquiryForm() {
   const [submitted, setSubmitted] = useState(false);
   const [copied,    setCopied]    = useState(false);
 
-  const settings        = getSettings();
+  const [settings, setSettings] = useState(() => getSettings());
+
+  useEffect(() => {
+    function onUpdate(e) {
+      if (!e.detail?.key || e.detail.key === SETTINGS_KEY) {
+        setSettings(getSettings());
+      }
+    }
+    window.addEventListener('pt_data_updated', onUpdate);
+    return () => window.removeEventListener('pt_data_updated', onUpdate);
+  }, []);
+
   const CLIENT_FORM_URL = buildFormUrl(settings);
 
   function handleChange(e) {
