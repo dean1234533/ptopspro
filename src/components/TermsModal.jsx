@@ -11,7 +11,7 @@ By creating an account and using PT Ops Pro ("the App"), you agree to these Term
 PT Ops Pro is a business management tool for professional personal trainers. Access is granted on a per-licence basis following purchase. Your licence is personal and non-transferable — it may not be shared with or passed to any other individual.
 
 **3. Your Account**
-You are responsible for maintaining the security of your login credentials. You must notify us immediately at ptopspro@gmail.com if you suspect any unauthorised use of your account. We reserve the right to suspend or terminate accounts that breach these Terms.
+You are responsible for maintaining the security of your login credentials. You must notify us immediately at dbs_workouts@yahoo.com if you suspect any unauthorised use of your account. We reserve the right to suspend or terminate accounts that breach these Terms.
 
 **4. Acceptable Use**
 You agree not to:
@@ -41,7 +41,7 @@ We may update these Terms at any time. Continued use of the App after changes ar
 **11. Governing Law**
 These Terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.
 
-**Contact:** ptopspro@gmail.com
+**Contact:** dbs_workouts@yahoo.com
 `;
 
 const PRIVACY = `
@@ -49,7 +49,7 @@ const PRIVACY = `
 Last updated: June 2026
 
 **1. Who We Are**
-PT Ops Pro is operated as a sole-trader software product based in the United Kingdom. We are the data controller for information you provide when creating an account. Contact: ptopspro@gmail.com
+PT Ops Pro is operated as a sole-trader software product based in the United Kingdom. We are the data controller for information you provide when creating an account. Contact: dbs_workouts@yahoo.com
 
 **2. What Data We Collect**
 
@@ -84,7 +84,7 @@ You have the right to:
 - Object to or restrict processing
 - Data portability
 
-To exercise any of these rights, contact us at ptopspro@gmail.com. We will respond within 30 days.
+To exercise any of these rights, contact us at dbs_workouts@yahoo.com. We will respond within 30 days.
 
 **7. Security**
 All data is encrypted in transit (HTTPS) and at rest via Firebase's built-in security. Access to your data is restricted to your authenticated account only.
@@ -98,7 +98,7 @@ PT Ops Pro is not intended for use by anyone under the age of 18.
 **10. Changes to This Policy**
 We may update this Privacy Policy from time to time. We will notify you of significant changes via the App. Continued use constitutes acceptance.
 
-**Contact:** ptopspro@gmail.com
+**Contact:** dbs_workouts@yahoo.com
 `;
 
 function renderContent(text) {
