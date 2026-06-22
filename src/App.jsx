@@ -291,12 +291,17 @@ export default function App() {
 
         {/* Install banner */}
         {showInstall && (
-          <div className="flex items-center justify-between gap-3 bg-gray-900 border-b border-gray-800 px-4 py-3">
-            <div className="min-w-0">
+          <div className="flex items-center gap-3 bg-gray-900 border-b border-gray-800 px-4 py-3">
+            {/* App icon */}
+            <svg className="h-10 w-10 flex-shrink-0 rounded-xl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#6366f1"/>
+              <text x="16" y="22" fontFamily="-apple-system,sans-serif" fontSize="18" fontWeight="700" fill="white" textAnchor="middle">P</text>
+            </svg>
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-white">
                 {isIOS ? 'Tap Share → Add to Home Screen' : 'Add to Home Screen'}
               </p>
-              <p className="text-[11px] text-gray-500">Get a full-screen app experience</p>
+              <p className="text-[11px] text-gray-500">Get the full PT Ops Pro experience</p>
             </div>
             <button onClick={() => setInstallDismissed(true)} className="flex-shrink-0 text-gray-600 hover:text-gray-400 text-lg leading-none">✕</button>
           </div>
