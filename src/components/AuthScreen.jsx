@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { signUp, logIn, resetPassword } from '../lib/auth';
+import { signUp, logIn, resetPassword, checkAuthorised } from '../lib/auth';
 
 const ERR = {
   'auth/email-already-in-use':    'An account with this email already exists.',
@@ -44,8 +44,16 @@ export default function AuthScreen() {
 
     setLoading(true);
     try {
-      if (mode === 'signup') await signUp(email, password);
-      else                   await logIn(email, password);
+      if (mode === 'signup') {
+        const allowed = await checkAuthorised(email);
+        if (!allowed) {
+          setError('This email hasn\'t been granted access. Please purchase PT Ops Pro to get started.');
+          return;
+        }
+        await signUp(email, password);
+      } else {
+        await logIn(email, password);
+      }
     } catch (err) {
       setError(ERR[err.code] || 'Something went wrong.');
     } finally {
