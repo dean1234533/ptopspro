@@ -6,10 +6,12 @@ import ClientList    from './components/ClientList';
 import Schedule      from './components/Schedule';
 import RssScout      from './components/RssScout';
 import Settings      from './components/Settings';
-import { getSettings, SETTINGS_KEY } from './lib/storage';
+import { getSettings, SETTINGS_KEY, initFirebaseStorage, stopFirebaseStorage } from './lib/storage';
 import { buildFormUrl } from './components/Settings';
 import { startSync, stopSync } from './lib/sync';
 import { useUpdateCheck } from './hooks/useUpdateCheck';
+import { onAuthChange, logOut } from './lib/auth';
+import AuthScreen from './components/AuthScreen';
 import ToastContainer, { notify as toastNotify } from './components/Toast';
 
 const TABS = [
@@ -84,8 +86,9 @@ const GearIcon = () => (
 );
 
 export default function App() {
+  const [authUser,     setAuthUser]     = useState(undefined); // undefined = loading
   const [activeTab,    setActiveTab]    = useState('playbook');
-  const [showSettings, setShowSettings] = useState(() => !getSettings().trainerId);
+  const [showSettings, setShowSettings] = useState(false);
   const [linkCopied,   setLinkCopied]  = useState(false);
   const [installDismissed, setInstallDismissed] = useState(false);
   const updateAvailable = useUpdateCheck();
@@ -94,6 +97,24 @@ export default function App() {
   const isAndroid   = /Android/.test(navigator.userAgent);
   const isPWA       = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
   const showInstall = !isPWA && (isIOS || isAndroid) && !installDismissed;
+
+  // Auth state — drives everything
+  useEffect(() => {
+    const unsub = onAuthChange(user => {
+      setAuthUser(user);
+      if (user) {
+        initFirebaseStorage(user.uid);
+        // Show profile setup on first login (no name saved yet)
+        setTimeout(() => {
+          if (!getSettings().trainerName) setShowSettings(true);
+        }, 1000);
+      } else {
+        stopFirebaseStorage();
+        stopSync();
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const [outreachForm, setOutreachForm] = useState({
     companyName: '', ownerName: '', websiteUrl: '', toEmail: '',
@@ -144,6 +165,18 @@ export default function App() {
     setOutreachForm(prev => ({ ...prev, ...fields }));
     setActiveTab('outreach');
   }
+
+  // Auth loading
+  if (authUser === undefined) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-950" style={{minHeight:'100dvh'}}>
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-800 border-t-indigo-500" />
+      </div>
+    );
+  }
+
+  // Not logged in
+  if (!authUser) return <AuthScreen />;
 
   return (
     <div className="flex min-h-screen bg-gray-950" style={{minHeight:'100dvh'}}>
@@ -203,6 +236,15 @@ export default function App() {
           >
             <GearIcon />
             Settings
+          </button>
+          <button
+            onClick={() => logOut()}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-800/80 hover:text-gray-400"
+          >
+            <svg className="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Log out
           </button>
         </div>
       </aside>

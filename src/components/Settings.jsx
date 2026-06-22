@@ -26,10 +26,7 @@ export default function Settings({ onClose }) {
 
   function handleSave(e) {
     e.preventDefault();
-    const toSave = { ...form };
-    if (!toSave.trainerId) toSave.trainerId = crypto.randomUUID();
-    saveSettings(toSave);
-    setForm(toSave);
+    saveSettings({ ...form });
     setSaved(true);
     setTimeout(() => onClose(), 800);
   }

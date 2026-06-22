@@ -7,14 +7,11 @@ export const PROSPECTS_KEY = 'prospects';
 export const OUTREACH_KEY  = 'outreach';
 export const SETTINGS_KEY  = 'settings';
 
-const LOCAL_ID_KEY = 'pt_trainer_id';
-
 function getDb() {
   const app = getApps().length ? getApps()[0] : initializeApp(FIREBASE_CONFIG);
   return getFirestore(app);
 }
 
-// In-memory cache — populated by onSnapshot listeners
 const cache = {
   [ENQUIRIES_KEY]: [],
   [PROSPECTS_KEY]: [],
@@ -23,25 +20,19 @@ const cache = {
 };
 
 const unsubs = [];
+let _trainerId = null;
 
 function dispatch(key) {
   window.dispatchEvent(new CustomEvent('pt_data_updated', { detail: { key } }));
 }
 
-function getTrainerId() {
-  try { return localStorage.getItem(LOCAL_ID_KEY) || null; } catch { return null; }
-}
-
 // ── Public: read ──────────────────────────────────────────────────────────────
 
-export function getStored(key) {
-  return cache[key] ?? [];
-}
+export function getStored(key) { return cache[key] ?? []; }
 
 export function getSettings() {
-  const trainerId = getTrainerId();
-  if (!trainerId) return {};
-  return { ...cache[SETTINGS_KEY], trainerId };
+  if (!_trainerId) return {};
+  return { ...cache[SETTINGS_KEY], trainerId: _trainerId };
 }
 
 // ── Public: init ──────────────────────────────────────────────────────────────
@@ -50,109 +41,81 @@ async function deleteOldRecords(db, trainerId) {
   const cutoff = new Date();
   cutoff.setMonth(cutoff.getMonth() - 3);
   const cutoffStr = cutoff.toISOString();
-
   for (const col of [ENQUIRIES_KEY, PROSPECTS_KEY, OUTREACH_KEY]) {
     try {
-      const q = query(
-        collection(db, 'trainers', trainerId, col),
-        where('createdAt', '<', cutoffStr)
-      );
-      const snap = await getDocs(q);
+      const snap = await getDocs(query(collection(db, 'trainers', trainerId, col), where('createdAt', '<', cutoffStr)));
       snap.forEach(d => deleteDoc(d.ref));
-    } catch {
-      // Index may not exist yet — silently skip
-    }
+    } catch { /* index may not exist yet */ }
   }
 }
 
-export function initFirebaseStorage() {
-  const trainerId = getTrainerId();
-  if (!trainerId) return;
+export function initFirebaseStorage(uid) {
+  if (!uid || _trainerId === uid) return;
+  _trainerId = uid;
+
+  // Tear down any old listeners (e.g. if user switched accounts)
+  stopFirebaseStorage(false);
 
   const db = getDb();
+  deleteOldRecords(db, uid);
 
-  // Clean up records older than 3 months
-  deleteOldRecords(db, trainerId);
-
-  // Settings doc
   unsubs.push(
     onSnapshot(
-      doc(db, 'trainers', trainerId),
+      doc(db, 'trainers', uid),
       snap => { cache[SETTINGS_KEY] = snap.exists() ? snap.data() : {}; dispatch(SETTINGS_KEY); },
-      err => console.error('settings snapshot error:', err.code)
+      err => console.error('settings error:', err.code)
     )
   );
 
-  // Subcollections
   [ENQUIRIES_KEY, PROSPECTS_KEY, OUTREACH_KEY].forEach(col => {
     unsubs.push(
       onSnapshot(
-        collection(db, 'trainers', trainerId, col),
+        collection(db, 'trainers', uid, col),
         snap => {
           cache[col] = snap.docs
             .map(d => ({ id: d.id, ...d.data() }))
             .sort((a, b) => (b.createdAt ?? '') > (a.createdAt ?? '') ? 1 : -1);
           dispatch(col);
         },
-        err => console.error(`${col} snapshot error:`, err.code)
+        err => console.error(`${col} error:`, err.code)
       )
     );
   });
 }
 
-export function stopFirebaseStorage() {
+export function stopFirebaseStorage(clearId = true) {
   unsubs.forEach(u => u());
   unsubs.length = 0;
+  if (clearId) _trainerId = null;
+  Object.assign(cache, { [ENQUIRIES_KEY]: [], [PROSPECTS_KEY]: [], [OUTREACH_KEY]: [], [SETTINGS_KEY]: {} });
 }
 
 // ── Public: settings ──────────────────────────────────────────────────────────
 
 export function saveSettings(data) {
-  let trainerId = data.trainerId;
-  if (!trainerId) {
-    trainerId = crypto.randomUUID();
-    data = { ...data, trainerId };
-  }
-
-  try { localStorage.setItem(LOCAL_ID_KEY, trainerId); } catch { /* private mode */ }
-
-  // Store everything except trainerId in the Firebase doc
+  if (!_trainerId) return;
   const { trainerId: _id, ...fields } = data;
-  const db = getDb();
-  setDoc(doc(db, 'trainers', trainerId), fields, { merge: true });
-
-  // Update cache immediately so UI reflects the save
+  setDoc(doc(getDb(), 'trainers', _trainerId), fields, { merge: true });
   cache[SETTINGS_KEY] = fields;
   dispatch(SETTINGS_KEY);
-
-  // Start listeners if this is first-time setup
-  if (unsubs.length === 0) initFirebaseStorage();
 }
 
 // ── Public: CRUD ──────────────────────────────────────────────────────────────
 
 export async function addRecord(key, record) {
-  const trainerId = getTrainerId();
-  if (!trainerId) return;
-  const entry = { ...record, createdAt: new Date().toISOString() };
-  const db = getDb();
-  await addDoc(collection(db, 'trainers', trainerId, key), entry);
+  if (!_trainerId) return;
+  await addDoc(collection(getDb(), 'trainers', _trainerId, key), { ...record, createdAt: new Date().toISOString() });
 }
 
 export function updateRecord(key, id, updates) {
-  const trainerId = getTrainerId();
-  if (!trainerId) return;
-  const db = getDb();
-  updateDoc(doc(db, 'trainers', trainerId, key, id), updates);
+  if (!_trainerId) return;
+  updateDoc(doc(getDb(), 'trainers', _trainerId, key, id), updates);
 }
 
 export function deleteRecord(key, id) {
-  const trainerId = getTrainerId();
-  if (!trainerId) return;
-  const db = getDb();
-  deleteDoc(doc(db, 'trainers', trainerId, key, id));
+  if (!_trainerId) return;
+  deleteDoc(doc(getDb(), 'trainers', _trainerId, key, id));
 }
 
-// Kept for Electron compat — no-op on web
 export async function initStorage() {}
 export function setStored() {}
