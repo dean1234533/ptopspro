@@ -9,6 +9,7 @@ import Settings      from './components/Settings';
 import { getSettings, SETTINGS_KEY } from './lib/storage';
 import { buildFormUrl } from './components/Settings';
 import { startSync, stopSync } from './lib/sync';
+import { useUpdateCheck } from './hooks/useUpdateCheck';
 
 const TABS = [
   {
@@ -85,6 +86,7 @@ export default function App() {
   const [activeTab,    setActiveTab]    = useState('playbook');
   const [showSettings, setShowSettings] = useState(() => !getSettings().trainerId);
   const [linkCopied,   setLinkCopied]  = useState(false);
+  const updateAvailable = useUpdateCheck();
 
   const [outreachForm, setOutreachForm] = useState({
     companyName: '', ownerName: '', websiteUrl: '', toEmail: '',
@@ -175,7 +177,7 @@ export default function App() {
             </svg>
             {linkCopied ? 'Link Copied!' : 'Share Enquiry Link'}
           </button>
-          <
+          <a
             href="https://wa.me/447752300937"
             target="_blank"
             rel="noreferrer"
@@ -222,6 +224,19 @@ export default function App() {
             </div>
           </div>
         </header>
+
+        {/* Update banner */}
+        {updateAvailable && (
+          <div className="flex items-center justify-between gap-3 bg-indigo-600 px-4 py-2.5 text-sm text-white">
+            <span className="font-medium">A new version is available.</span>
+            <button
+              onClick={() => window.location.reload()}
+              className="flex-shrink-0 rounded-lg border border-white/30 px-3 py-1 text-xs font-semibold hover:bg-white/10 transition"
+            >
+              Update now
+            </button>
+          </div>
+        )}
 
         {/* Page content */}
         <main className="flex-1 px-4 pb-24 pt-4 md:px-8 md:pb-8 md:pt-6">
