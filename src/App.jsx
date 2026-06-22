@@ -13,6 +13,7 @@ import { useUpdateCheck } from './hooks/useUpdateCheck';
 import { onAuthChange, logOut } from './lib/auth';
 import AuthScreen from './components/AuthScreen';
 import ToastContainer, { notify as toastNotify } from './components/Toast';
+import TermsModal from './components/TermsModal';
 
 const TABS = [
   {
@@ -89,6 +90,7 @@ export default function App() {
   const [authUser,     setAuthUser]     = useState(undefined); // undefined = loading
   const [activeTab,    setActiveTab]    = useState('playbook');
   const [showSettings, setShowSettings] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(() => !!localStorage.getItem('terms_accepted'));
   const [linkCopied,   setLinkCopied]  = useState(false);
   const [installDismissed, setInstallDismissed] = useState(false);
   const updateAvailable = useUpdateCheck();
@@ -370,6 +372,14 @@ export default function App() {
 
       {/* Settings modal */}
       {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+
+      {/* Terms & Privacy modal — shown once on first use */}
+      {!termsAccepted && (
+        <TermsModal onAccept={() => {
+          localStorage.setItem('terms_accepted', '1');
+          setTermsAccepted(true);
+        }} />
+      )}
 
       {/* In-app toast notifications */}
       <ToastContainer />

@@ -158,7 +158,15 @@ export default function Settings({ onClose }) {
           </div>
         </div>
 
-        <div className="mt-5 border-t border-gray-800 pt-5 text-center">
+        <div className="mt-5 flex justify-center gap-4 text-xs text-gray-600">
+          <button onClick={() => { localStorage.removeItem('terms_accepted'); window.location.reload(); }}
+            className="hover:text-gray-400 transition">Terms of Service</button>
+          <span>·</span>
+          <button onClick={() => { localStorage.removeItem('terms_accepted'); window.location.reload(); }}
+            className="hover:text-gray-400 transition">Privacy Policy</button>
+        </div>
+
+        <div className="mt-4 border-t border-gray-800 pt-5 text-center">
           <a
             href="https://wa.me/447752300937"
             target="_blank"
