@@ -27,15 +27,30 @@ function StatusPill({ status, onClick }) {
 }
 
 function EnquiryCard({ enquiry, onDelete }) {
-  const [open, setOpen] = useState(false);
+  const [open,        setOpen]        = useState(false);
+  const [editingNote, setEditingNote] = useState(false);
+  const [noteVal,     setNoteVal]     = useState(enquiry.message || '');
 
   function advanceStatus() {
     updateRecord(ENQUIRIES_KEY, enquiry.id, { status: NEXT_STATUS[enquiry.status] ?? 'new' });
   }
 
+  function saveConsultation(val) {
+    updateRecord(ENQUIRIES_KEY, enquiry.id, { consultationTime: val });
+  }
+
+  function saveNote() {
+    updateRecord(ENQUIRIES_KEY, enquiry.id, { message: noteVal });
+    setEditingNote(false);
+  }
+
   const date = enquiry.createdAt
     ? new Date(enquiry.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
     : '—';
+
+  const consultDisplay = enquiry.consultationTime
+    ? new Date(enquiry.consultationTime).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' })
+    : null;
 
   return (
     <div className="rounded-xl border border-gray-800 bg-gray-900 overflow-hidden">
@@ -63,31 +78,67 @@ function EnquiryCard({ enquiry, onDelete }) {
       </div>
 
       {open && (
-        <div className="border-t border-gray-800 px-4 py-3 space-y-2 text-sm">
+        <div className="border-t border-gray-800 px-4 py-3 space-y-2.5 text-sm">
+
+          {/* Consultation time — always shown, editable */}
+          <div className="flex items-start gap-2">
+            <span className="w-24 flex-shrink-0 text-xs text-gray-500 pt-1">Consultation</span>
+            <div className="flex-1">
+              <input
+                type="datetime-local"
+                defaultValue={enquiry.consultationTime ? enquiry.consultationTime.slice(0, 16) : ''}
+                onChange={e => saveConsultation(e.target.value ? new Date(e.target.value).toISOString() : '')}
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-xs text-gray-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:dark]"
+              />
+              {consultDisplay && (
+                <p className="mt-1 text-[10px] text-emerald-500">{consultDisplay}</p>
+              )}
+            </div>
+          </div>
+
           {enquiry.phone && (
             <div className="flex gap-2">
               <span className="w-24 flex-shrink-0 text-xs text-gray-500">Phone</span>
-              <a href={`tel:${enquiry.phone}`} className="text-indigo-400 hover:underline">{enquiry.phone}</a>
+              <a href={`tel:${enquiry.phone}`} className="text-indigo-400 hover:underline text-xs">{enquiry.phone}</a>
             </div>
           )}
           {enquiry.goal && (
             <div className="flex gap-2">
               <span className="w-24 flex-shrink-0 text-xs text-gray-500">Goal</span>
-              <span className="text-gray-300">{enquiry.goal}</span>
+              <span className="text-gray-300 text-xs">{enquiry.goal}</span>
             </div>
           )}
           {enquiry.availability?.length > 0 && (
             <div className="flex gap-2">
               <span className="w-24 flex-shrink-0 text-xs text-gray-500">Slots</span>
-              <span className="text-gray-300">{enquiry.availability.join(', ')}</span>
+              <span className="text-gray-300 text-xs">{enquiry.availability.join(', ')}</span>
             </div>
           )}
-          {enquiry.message && (
-            <div className="flex gap-2">
-              <span className="w-24 flex-shrink-0 text-xs text-gray-500">Notes</span>
-              <span className="text-gray-300">{enquiry.message}</span>
-            </div>
-          )}
+
+          {/* Editable notes */}
+          <div className="flex items-start gap-2">
+            <span className="w-24 flex-shrink-0 text-xs text-gray-500 pt-1">Notes</span>
+            {editingNote ? (
+              <div className="flex-1 space-y-1.5">
+                <textarea
+                  autoFocus
+                  rows={3}
+                  value={noteVal}
+                  onChange={e => setNoteVal(e.target.value)}
+                  className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-xs text-gray-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                />
+                <div className="flex gap-2">
+                  <button onClick={saveNote} className="rounded-lg bg-indigo-600 px-3 py-1 text-[10px] font-semibold text-white hover:bg-indigo-500">Save</button>
+                  <button onClick={() => { setNoteVal(enquiry.message || ''); setEditingNote(false); }} className="rounded-lg border border-gray-700 px-3 py-1 text-[10px] text-gray-400 hover:border-gray-600">Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setEditingNote(true)} className="flex-1 text-left text-xs text-gray-400 hover:text-gray-200 transition">
+                {enquiry.message || <span className="italic text-gray-600">Add a note…</span>}
+              </button>
+            )}
+          </div>
+
           <div className="flex gap-2">
             <span className="w-24 flex-shrink-0 text-xs text-gray-500">Received</span>
             <span className="text-gray-500 text-xs">{date}</span>
