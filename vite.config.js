@@ -17,5 +17,5 @@ export default defineConfig({
   define: {
     __BUILD_TIME__: JSON.stringify(buildTime),
   },
-  base: '/',
+  base: process.env.VITE_BASE || '/',
 });
