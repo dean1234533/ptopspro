@@ -1,69 +1,131 @@
-export const ENQUIRIES_KEY = 'pt_enquiries';
-export const PROSPECTS_KEY = 'pt_prospects';
-export const OUTREACH_KEY  = 'pt_outreach';
-export const SETTINGS_KEY  = 'pt_settings';
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
+import { FIREBASE_CONFIG } from './config';
 
-const ALL_KEYS   = [ENQUIRIES_KEY, PROSPECTS_KEY, OUTREACH_KEY];
-const isElectron = typeof window !== 'undefined' && !!window.electronAPI;
+export const ENQUIRIES_KEY = 'enquiries';
+export const PROSPECTS_KEY = 'prospects';
+export const OUTREACH_KEY  = 'outreach';
+export const SETTINGS_KEY  = 'settings';
 
-// In-memory cache — populated by initStorage() before React renders
-const mem = {};
+const LOCAL_ID_KEY = 'pt_trainer_id';
 
-// Call once before ReactDOM.createRoot so components can read synchronously
-export async function initStorage() {
-  if (!isElectron) return;
-  await Promise.all([
-    ...ALL_KEYS.map(async k => { mem[k] = await window.electronAPI.readData(k); }),
-    (async () => { mem[SETTINGS_KEY] = await window.electronAPI.readData(SETTINGS_KEY); })(),
-  ]);
+function getDb() {
+  const app = getApps().length ? getApps()[0] : initializeApp(FIREBASE_CONFIG);
+  return getFirestore(app);
 }
 
-function read(key) {
-  if (isElectron) return mem[key] ?? [];
-  try { return JSON.parse(localStorage.getItem(key) ?? '[]'); }
-  catch { return []; }
-}
+// In-memory cache — populated by onSnapshot listeners
+const cache = {
+  [ENQUIRIES_KEY]: [],
+  [PROSPECTS_KEY]: [],
+  [OUTREACH_KEY]:  [],
+  [SETTINGS_KEY]:  {},
+};
 
-function write(key, data) {
-  if (isElectron) {
-    mem[key] = data;
-    window.electronAPI.writeData(key, data); // async fire-and-forget — near instant
-  } else {
-    localStorage.setItem(key, JSON.stringify(data));
-  }
+const unsubs = [];
+
+function dispatch(key) {
   window.dispatchEvent(new CustomEvent('pt_data_updated', { detail: { key } }));
 }
 
-// Settings helpers — single object, not an array
-export function getSettings() {
-  if (isElectron) return mem[SETTINGS_KEY] ?? {};
-  try { return JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}'); }
-  catch { return {}; }
+function getTrainerId() {
+  return localStorage.getItem(LOCAL_ID_KEY) || null;
 }
+
+// ── Public: read ──────────────────────────────────────────────────────────────
+
+export function getStored(key) {
+  return cache[key] ?? [];
+}
+
+export function getSettings() {
+  const trainerId = getTrainerId();
+  if (!trainerId) return {};
+  return { ...cache[SETTINGS_KEY], trainerId };
+}
+
+// ── Public: init ──────────────────────────────────────────────────────────────
+
+export function initFirebaseStorage() {
+  const trainerId = getTrainerId();
+  if (!trainerId) return;
+
+  const db = getDb();
+
+  // Settings doc
+  unsubs.push(
+    onSnapshot(doc(db, 'trainers', trainerId), snap => {
+      cache[SETTINGS_KEY] = snap.exists() ? snap.data() : {};
+      dispatch(SETTINGS_KEY);
+    })
+  );
+
+  // Subcollections
+  [ENQUIRIES_KEY, PROSPECTS_KEY, OUTREACH_KEY].forEach(col => {
+    unsubs.push(
+      onSnapshot(collection(db, 'trainers', trainerId, col), snap => {
+        cache[col] = snap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (b.createdAt ?? '') > (a.createdAt ?? '') ? 1 : -1);
+        dispatch(col);
+      })
+    );
+  });
+}
+
+export function stopFirebaseStorage() {
+  unsubs.forEach(u => u());
+  unsubs.length = 0;
+}
+
+// ── Public: settings ──────────────────────────────────────────────────────────
 
 export function saveSettings(data) {
-  if (isElectron) {
-    mem[SETTINGS_KEY] = data;
-    window.electronAPI.writeData(SETTINGS_KEY, data);
-  } else {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+  let trainerId = data.trainerId;
+  if (!trainerId) {
+    trainerId = crypto.randomUUID();
+    data = { ...data, trainerId };
   }
-  window.dispatchEvent(new CustomEvent('pt_data_updated', { detail: { key: SETTINGS_KEY } }));
+
+  localStorage.setItem(LOCAL_ID_KEY, trainerId);
+
+  // Store everything except trainerId in the Firebase doc
+  const { trainerId: _id, ...fields } = data;
+  const db = getDb();
+  setDoc(doc(db, 'trainers', trainerId), fields, { merge: true });
+
+  // Update cache immediately so UI reflects the save
+  cache[SETTINGS_KEY] = fields;
+  dispatch(SETTINGS_KEY);
+
+  // Start listeners if this is first-time setup
+  if (unsubs.length === 0) initFirebaseStorage();
 }
 
-export function getStored(key)        { return read(key); }
-export function setStored(key, data)  { write(key, data); }
+// ── Public: CRUD ──────────────────────────────────────────────────────────────
 
-export function addRecord(key, record) {
-  const entry = { ...record, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
-  write(key, [entry, ...read(key)]);
-  return entry;
+export async function addRecord(key, record) {
+  const trainerId = getTrainerId();
+  if (!trainerId) return;
+  const entry = { ...record, createdAt: new Date().toISOString() };
+  const db = getDb();
+  await addDoc(collection(db, 'trainers', trainerId, key), entry);
 }
 
 export function updateRecord(key, id, updates) {
-  write(key, read(key).map(r => r.id === id ? { ...r, ...updates } : r));
+  const trainerId = getTrainerId();
+  if (!trainerId) return;
+  const db = getDb();
+  updateDoc(doc(db, 'trainers', trainerId, key, id), updates);
 }
 
 export function deleteRecord(key, id) {
-  write(key, read(key).filter(r => r.id !== id));
+  const trainerId = getTrainerId();
+  if (!trainerId) return;
+  const db = getDb();
+  deleteDoc(doc(db, 'trainers', trainerId, key, id));
 }
+
+// Kept for Electron compat — no-op on web
+export async function initStorage() {}
+export function setStored() {}
