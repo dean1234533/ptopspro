@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, doc, query, where, onSnapshot, getDocs, addDoc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { FIREBASE_CONFIG } from './config';
 
 export const ENQUIRIES_KEY = 'enquiries';
@@ -46,11 +46,33 @@ export function getSettings() {
 
 // ── Public: init ──────────────────────────────────────────────────────────────
 
+async function deleteOldRecords(db, trainerId) {
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - 3);
+  const cutoffStr = cutoff.toISOString();
+
+  for (const col of [ENQUIRIES_KEY, PROSPECTS_KEY, OUTREACH_KEY]) {
+    try {
+      const q = query(
+        collection(db, 'trainers', trainerId, col),
+        where('createdAt', '<', cutoffStr)
+      );
+      const snap = await getDocs(q);
+      snap.forEach(d => deleteDoc(d.ref));
+    } catch {
+      // Index may not exist yet — silently skip
+    }
+  }
+}
+
 export function initFirebaseStorage() {
   const trainerId = getTrainerId();
   if (!trainerId) return;
 
   const db = getDb();
+
+  // Clean up records older than 3 months
+  deleteOldRecords(db, trainerId);
 
   // Settings doc
   unsubs.push(
