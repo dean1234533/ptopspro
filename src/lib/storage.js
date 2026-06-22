@@ -76,21 +76,26 @@ export function initFirebaseStorage() {
 
   // Settings doc
   unsubs.push(
-    onSnapshot(doc(db, 'trainers', trainerId), snap => {
-      cache[SETTINGS_KEY] = snap.exists() ? snap.data() : {};
-      dispatch(SETTINGS_KEY);
-    })
+    onSnapshot(
+      doc(db, 'trainers', trainerId),
+      snap => { cache[SETTINGS_KEY] = snap.exists() ? snap.data() : {}; dispatch(SETTINGS_KEY); },
+      err => console.error('settings snapshot error:', err.code)
+    )
   );
 
   // Subcollections
   [ENQUIRIES_KEY, PROSPECTS_KEY, OUTREACH_KEY].forEach(col => {
     unsubs.push(
-      onSnapshot(collection(db, 'trainers', trainerId, col), snap => {
-        cache[col] = snap.docs
-          .map(d => ({ id: d.id, ...d.data() }))
-          .sort((a, b) => (b.createdAt ?? '') > (a.createdAt ?? '') ? 1 : -1);
-        dispatch(col);
-      })
+      onSnapshot(
+        collection(db, 'trainers', trainerId, col),
+        snap => {
+          cache[col] = snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => (b.createdAt ?? '') > (a.createdAt ?? '') ? 1 : -1);
+          dispatch(col);
+        },
+        err => console.error(`${col} snapshot error:`, err.code)
+      )
     );
   });
 }
