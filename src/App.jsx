@@ -10,6 +10,7 @@ import { getSettings, SETTINGS_KEY } from './lib/storage';
 import { buildFormUrl } from './components/Settings';
 import { startSync, stopSync } from './lib/sync';
 import { useUpdateCheck } from './hooks/useUpdateCheck';
+import ToastContainer, { notify as toastNotify } from './components/Toast';
 
 const TABS = [
   {
@@ -106,10 +107,12 @@ export default function App() {
     if (canNotify && Notification.permission === 'default') Notification.requestPermission();
 
     function notify(rows) {
-      if (!canNotify || Notification.permission !== 'granted') return;
-      rows.forEach(r => {
-        new Notification('New Enquiry — PT Ops Pro', { body: `${r.name} wants to book a consultation` });
-      });
+      // In-app toast (works on all platforms)
+      toastNotify(rows);
+      // OS notification where supported (desktop + Android Chrome)
+      if (canNotify && Notification.permission === 'granted') {
+        rows.forEach(r => new Notification('New Enquiry — PT Ops Pro', { body: `${r.name} wants to book a consultation` }));
+      }
     }
 
     function initSync() {
@@ -271,6 +274,9 @@ export default function App() {
 
       {/* Settings modal */}
       {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+
+      {/* In-app toast notifications */}
+      <ToastContainer />
     </div>
   );
 }
