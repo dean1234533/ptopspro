@@ -7,6 +7,7 @@ import Schedule      from './components/Schedule';
 import RssScout      from './components/RssScout';
 import Settings      from './components/Settings';
 import { getSettings, SETTINGS_KEY } from './lib/storage';
+import { buildFormUrl } from './components/Settings';
 import { startSync, stopSync } from './lib/sync';
 
 const TABS = [
@@ -83,10 +84,20 @@ const GearIcon = () => (
 export default function App() {
   const [activeTab,    setActiveTab]    = useState('playbook');
   const [showSettings, setShowSettings] = useState(() => !getSettings().trainerId);
+  const [linkCopied,   setLinkCopied]  = useState(false);
 
   const [outreachForm, setOutreachForm] = useState({
     companyName: '', ownerName: '', websiteUrl: '', toEmail: '',
   });
+
+  function copyShareLink() {
+    const url = buildFormUrl(getSettings());
+    if (!url) { setShowSettings(true); return; }
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
+  }
 
   useEffect(() => {
     if (Notification.permission === 'default') Notification.requestPermission();
@@ -155,7 +166,16 @@ export default function App() {
 
         {/* Settings + Support */}
         <div className="border-t border-gray-800 p-3 space-y-0.5">
-          <a
+          <button
+            onClick={copyShareLink}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-indigo-400 transition-colors hover:bg-indigo-500/10 hover:text-indigo-300"
+          >
+            <svg className="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            {linkCopied ? 'Link Copied!' : 'Share Enquiry Link'}
+          </button>
+          <
             href="https://wa.me/447752300937"
             target="_blank"
             rel="noreferrer"
@@ -184,13 +204,22 @@ export default function App() {
           <div className="flex items-center gap-3 px-4 py-3">
             <span className="text-lg font-bold tracking-tight text-white">PT Ops</span>
             <span className="rounded-full bg-indigo-600 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">Pro</span>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="ml-auto rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-gray-300"
-              aria-label="Settings"
-            >
-              <GearIcon />
-            </button>
+            <div className="ml-auto flex items-center gap-1">
+              <button
+                onClick={copyShareLink}
+                className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-indigo-400 transition hover:bg-indigo-500/10"
+                aria-label="Copy enquiry link"
+              >
+                {linkCopied ? 'Copied!' : 'Share Link'}
+              </button>
+              <button
+                onClick={() => setShowSettings(true)}
+                className="rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-gray-300"
+                aria-label="Settings"
+              >
+                <GearIcon />
+              </button>
+            </div>
           </div>
         </header>
 

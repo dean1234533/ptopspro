@@ -11,8 +11,9 @@ export function buildFormUrl(s) {
 }
 
 export default function Settings({ onClose }) {
-  const [form,  setForm]  = useState(EMPTY);
-  const [saved, setSaved] = useState(false);
+  const [form,   setForm]   = useState(EMPTY);
+  const [saved,  setSaved]  = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const s = getSettings();
@@ -32,6 +33,15 @@ export default function Settings({ onClose }) {
     setSaved(true);
     setTimeout(() => onClose(), 800);
   }
+
+  function copyLink(url) {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  const formUrl = buildFormUrl(form);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center">
@@ -69,7 +79,27 @@ export default function Settings({ onClose }) {
           </button>
         </form>
 
-        <div className="mt-6 border-t border-gray-800 pt-5 text-center">
+        {/* Shareable link — shown once profile is set up */}
+        {formUrl && (
+          <div className="mt-5 rounded-xl border border-indigo-500/30 bg-indigo-500/8 p-4">
+            <p className="mb-1 text-xs font-semibold text-indigo-300">Your client enquiry link</p>
+            <p className="mb-3 text-[11px] text-indigo-400/70">Send this to potential clients via WhatsApp, Instagram, or add it to your Google Business Profile.</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 truncate rounded-lg bg-gray-900/60 px-3 py-2 text-[11px] font-mono text-indigo-300 border border-indigo-500/20">
+                {formUrl}
+              </code>
+              <button
+                type="button"
+                onClick={() => copyLink(formUrl)}
+                className="flex-shrink-0 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500"
+              >
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-5 border-t border-gray-800 pt-5 text-center">
           <a
             href="https://wa.me/447752300937"
             target="_blank"
