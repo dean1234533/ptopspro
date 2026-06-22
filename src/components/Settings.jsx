@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import { getSettings, saveSettings } from '../lib/storage';
 
 const EMPTY = { trainerName: '', businessName: '', serviceArea: '', trainerId: '' };
-const BASE_URL = 'https://ptopspro.vercel.app/enquiry.html';
-
 export function buildFormUrl(s) {
   if (!s || !s.trainerId) return null;
-  return `${BASE_URL}?id=${s.trainerId}`;
+  const base = `${window.location.origin}/enquiry.html`;
+  return `${base}?id=${s.trainerId}`;
 }
 
 function Toggle({ on, onToggle }) {
