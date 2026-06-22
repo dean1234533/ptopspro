@@ -326,7 +326,7 @@ export default function App() {
         )}
 
         {/* Page content */}
-        <main className="flex-1 px-4 pt-4 md:px-8 md:pb-8 md:pt-6" style={{paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))'}}>
+        <main className="flex-1 overflow-y-auto px-4 pt-4 md:px-8 md:pb-8 md:pt-6" style={{paddingBottom: 'calc(4.5rem + env(safe-area-inset-bottom))'}}>
           <div className="mx-auto w-full max-w-2xl">
             {activeTab === 'playbook'  && <Playbook />}
             {activeTab === 'outreach'  && <LeadDashboard formState={outreachForm} setFormState={setOutreachForm} />}
@@ -338,20 +338,32 @@ export default function App() {
         </main>
 
         {/* Mobile bottom nav */}
-        <nav className="fixed bottom-0 left-0 right-0 z-20 border-t border-gray-800 bg-gray-950/95 backdrop-blur-sm md:hidden" style={{paddingBottom:'env(safe-area-inset-bottom)'}}>
+        <nav
+          className="fixed bottom-0 left-0 right-0 z-20 border-t border-gray-800 bg-gray-950 md:hidden"
+          style={{paddingBottom:'env(safe-area-inset-bottom)'}}
+        >
           <div className="flex w-full">
-            {TABS.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[9px] font-medium transition-colors ${
-                  activeTab === tab.id ? 'text-indigo-400' : 'text-gray-600 hover:text-gray-400'
-                }`}
-              >
-                {tab.icon}
-                <span className="w-full truncate text-center leading-tight">{tab.label}</span>
-              </button>
-            ))}
+            {TABS.map(tab => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors ${
+                    active ? 'text-white' : 'text-gray-600'
+                  }`}
+                >
+                  <div className={`flex items-center justify-center rounded-lg p-1 transition-colors ${
+                    active ? 'bg-indigo-600' : ''
+                  }`}>
+                    {tab.icon}
+                  </div>
+                  <span className={`text-[9px] font-medium leading-none ${active ? 'text-indigo-400' : 'text-gray-600'}`}>
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </nav>
       </div>
