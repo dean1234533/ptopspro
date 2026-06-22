@@ -5,7 +5,7 @@ import EnquiryForm   from './components/EnquiryForm';
 import ClientList    from './components/ClientList';
 import RssScout      from './components/RssScout';
 import Settings      from './components/Settings';
-import { getSettings } from './lib/storage';
+import { getSettings, SETTINGS_KEY } from './lib/storage';
 import { startSync, stopSync } from './lib/sync';
 
 const TABS = [
@@ -79,14 +79,32 @@ export default function App() {
 
   useEffect(() => {
     if (Notification.permission === 'default') Notification.requestPermission();
-    startSync(rows => {
+
+    function notify(rows) {
       rows.forEach(r => {
         if (Notification.permission === 'granted') {
           new Notification('New Enquiry — PT Ops Pro', { body: `${r.name} wants to book a consultation` });
         }
       });
-    });
-    return () => stopSync();
+    }
+
+    function initSync() {
+      stopSync();
+      startSync(notify);
+    }
+
+    initSync();
+
+    // Restart sync whenever settings are saved (e.g. trainerId just became available)
+    function onUpdate(e) {
+      if (!e.detail?.key || e.detail.key === SETTINGS_KEY) initSync();
+    }
+    window.addEventListener('pt_data_updated', onUpdate);
+
+    return () => {
+      stopSync();
+      window.removeEventListener('pt_data_updated', onUpdate);
+    };
   }, []);
 
   function handleCopyToForm(fields) {
