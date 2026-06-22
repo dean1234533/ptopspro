@@ -29,7 +29,7 @@ function dispatch(key) {
 }
 
 function getTrainerId() {
-  return localStorage.getItem(LOCAL_ID_KEY) || null;
+  try { return localStorage.getItem(LOCAL_ID_KEY) || null; } catch { return null; }
 }
 
 // ── Public: read ──────────────────────────────────────────────────────────────
@@ -114,7 +114,7 @@ export function saveSettings(data) {
     data = { ...data, trainerId };
   }
 
-  localStorage.setItem(LOCAL_ID_KEY, trainerId);
+  try { localStorage.setItem(LOCAL_ID_KEY, trainerId); } catch { /* private mode */ }
 
   // Store everything except trainerId in the Firebase doc
   const { trainerId: _id, ...fields } = data;
