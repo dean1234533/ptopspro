@@ -133,10 +133,28 @@ export default function App() {
     const canNotify = typeof Notification !== 'undefined';
     if (canNotify && Notification.permission === 'default') Notification.requestPermission();
 
+    function playSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+        setTimeout(() => ctx.close(), 600);
+      } catch(e) {}
+    }
+
     function notify(rows) {
-      // In-app toast (works on all platforms)
       toastNotify(rows);
-      // OS notification where supported (desktop + Android Chrome)
+      const s = getSettings();
+      if (s.notifySound) playSound();
+      if (s.notifyVibrate && navigator.vibrate) navigator.vibrate([200, 100, 200]);
       if (canNotify && Notification.permission === 'granted') {
         rows.forEach(r => new Notification('New Enquiry — PT Ops Pro', { body: `${r.name} wants to book a consultation` }));
       }
@@ -179,7 +197,7 @@ export default function App() {
   if (!authUser) return <AuthScreen />;
 
   return (
-    <div className="flex min-h-screen bg-gray-950" style={{minHeight:'100dvh'}}>
+    <div className="flex min-h-screen w-screen overflow-x-hidden bg-gray-950" style={{minHeight:'100dvh'}}>
 
       {/* ── Sidebar — md and up ────────────────────────────────────────────── */}
       <aside className="hidden md:flex md:w-56 md:flex-col md:fixed md:inset-y-0 md:z-30 md:border-r md:border-gray-800 md:bg-gray-950">
@@ -250,7 +268,7 @@ export default function App() {
       </aside>
 
       {/* ── Main area ──────────────────────────────────────────────────────── */}
-      <div className="flex min-h-screen flex-1 flex-col md:ml-56" style={{minHeight:'100dvh'}}>
+      <div className="flex min-h-screen w-full min-w-0 flex-1 flex-col overflow-x-hidden md:ml-56" style={{minHeight:'100dvh'}}>
 
         {/* Mobile top bar */}
         <header className="sticky top-0 z-20 border-b border-gray-800 bg-gray-950/95 backdrop-blur-sm md:hidden">
@@ -321,17 +339,17 @@ export default function App() {
 
         {/* Mobile bottom nav */}
         <nav className="fixed bottom-0 left-0 right-0 z-20 border-t border-gray-800 bg-gray-950/95 backdrop-blur-sm md:hidden" style={{paddingBottom:'env(safe-area-inset-bottom)'}}>
-          <div className="flex">
+          <div className="flex w-full">
             {TABS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors ${
+                className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[9px] font-medium transition-colors ${
                   activeTab === tab.id ? 'text-indigo-400' : 'text-gray-600 hover:text-gray-400'
                 }`}
               >
                 {tab.icon}
-                <span className="truncate">{tab.label}</span>
+                <span className="w-full truncate text-center leading-tight">{tab.label}</span>
               </button>
             ))}
           </div>

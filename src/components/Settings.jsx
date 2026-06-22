@@ -10,14 +10,32 @@ export function buildFormUrl(s) {
   return `${BASE_URL}?for=${payload}`;
 }
 
+function Toggle({ on, onToggle }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${on ? 'bg-indigo-600' : 'bg-gray-700'}`}
+    >
+      <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${on ? 'translate-x-6' : 'translate-x-1'}`} />
+    </button>
+  );
+}
+
 export default function Settings({ onClose }) {
-  const [form,   setForm]   = useState(EMPTY);
-  const [saved,  setSaved]  = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [form,          setForm]          = useState(EMPTY);
+  const [saved,         setSaved]         = useState(false);
+  const [copied,        setCopied]        = useState(false);
+  const [notifySound,   setNotifySound]   = useState(false);
+  const [notifyVibrate, setNotifyVibrate] = useState(false);
 
   useEffect(() => {
     const s = getSettings();
-    if (s && Object.keys(s).length) setForm({ ...EMPTY, ...s });
+    if (s && Object.keys(s).length) {
+      setForm({ ...EMPTY, ...s });
+      setNotifySound(!!s.notifySound);
+      setNotifyVibrate(!!s.notifyVibrate);
+    }
   }, []);
 
   function handleChange(e) {
@@ -26,9 +44,21 @@ export default function Settings({ onClose }) {
 
   function handleSave(e) {
     e.preventDefault();
-    saveSettings({ ...form });
+    saveSettings({ ...form, notifySound, notifyVibrate });
     setSaved(true);
     setTimeout(() => onClose(), 800);
+  }
+
+  function toggleSound() {
+    const next = !notifySound;
+    setNotifySound(next);
+    saveSettings({ ...getSettings(), notifySound: next });
+  }
+
+  function toggleVibrate() {
+    const next = !notifyVibrate;
+    setNotifyVibrate(next);
+    saveSettings({ ...getSettings(), notifyVibrate: next });
   }
 
   function copyLink(url) {
@@ -76,7 +106,7 @@ export default function Settings({ onClose }) {
           </button>
         </form>
 
-        {/* Shareable link — shown once profile is set up */}
+        {/* Shareable link */}
         {formUrl && (
           <div className="mt-5 rounded-xl border border-indigo-500/30 bg-indigo-500/8 p-4">
             <p className="mb-1 text-xs font-semibold text-indigo-300">Your client enquiry link</p>
@@ -95,6 +125,27 @@ export default function Settings({ onClose }) {
             </div>
           </div>
         )}
+
+        {/* Notification preferences */}
+        <div className="mt-5 rounded-xl border border-gray-800 bg-gray-900 p-4 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">New Enquiry Alerts</p>
+
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-200">Sound</p>
+              <p className="text-xs text-gray-600">Play a chime when an enquiry arrives</p>
+            </div>
+            <Toggle on={notifySound} onToggle={toggleSound} />
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-200">Vibrate</p>
+              <p className="text-xs text-gray-600">Vibrate on new enquiry (Android)</p>
+            </div>
+            <Toggle on={notifyVibrate} onToggle={toggleVibrate} />
+          </div>
+        </div>
 
         <div className="mt-5 border-t border-gray-800 pt-5 text-center">
           <a
