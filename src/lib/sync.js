@@ -22,36 +22,44 @@ export function startSync(onNew) {
     where('trainer_id', '==', settings.trainerId),
   );
 
-  let initialLoad = true;
+  let isInitialLoad = true;
 
-  unsubscribe = onSnapshot(q, snapshot => {
-    // Skip the initial load — only react to new additions
-    if (initialLoad) { initialLoad = false; return; }
+  unsubscribe = onSnapshot(
+    q,
+    snapshot => {
+      const existing = getStored(ENQUIRIES_KEY);
+      const fresh = [];
 
-    const existing = getStored(ENQUIRIES_KEY);
-    const fresh = [];
+      snapshot.docChanges().forEach(change => {
+        if (change.type !== 'added') return;
+        const row = { id: change.doc.id, ...change.doc.data() };
 
-    snapshot.docChanges().forEach(change => {
-      if (change.type !== 'added') return;
-      const row = { id: change.doc.id, ...change.doc.data() };
-      if (existing.some(e => e.sourceId === row.id)) return;
+        // Skip if already saved locally
+        if (existing.some(e => e.sourceId === row.id)) return;
 
-      addRecord(ENQUIRIES_KEY, {
-        name:         row.name,
-        phone:        row.phone        || '',
-        email:        row.email        || '',
-        goal:         row.goal         || '',
-        availability: row.availability || [],
-        message:      row.notes        || '',
-        status:       'new',
-        sourceId:     row.id,
+        addRecord(ENQUIRIES_KEY, {
+          name:         row.name         || '',
+          phone:        row.phone        || '',
+          email:        row.email        || '',
+          goal:         row.goal         || '',
+          availability: row.availability || [],
+          message:      row.notes        || '',
+          status:       'new',
+          sourceId:     row.id,
+        });
+
+        fresh.push(row);
       });
 
-      fresh.push(row);
-    });
-
-    if (fresh.length) onNew(fresh);
-  });
+      // On initial load: silently sync any missed records, no notification
+      // On subsequent changes: fire notification for truly new submissions
+      if (fresh.length && !isInitialLoad) onNew(fresh);
+      isInitialLoad = false;
+    },
+    err => {
+      console.error('Firestore sync error:', err.code, err.message);
+    },
+  );
 }
 
 export function stopSync() {
