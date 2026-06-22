@@ -1,24 +1,27 @@
 import { useState, useEffect } from 'react';
 import { getStored, updateRecord, deleteRecord, ENQUIRIES_KEY } from '../lib/storage';
 
-const STATUS_STYLES = {
-  new:        'bg-indigo-500/15 text-indigo-400 ring-indigo-500/25',
-  contacted:  'bg-amber-500/15 text-amber-400 ring-amber-500/25',
-  booked:     'bg-emerald-500/15 text-emerald-400 ring-emerald-500/25',
-  closed:     'bg-gray-500/15 text-gray-500 ring-gray-500/25',
+const NEXT_STATUS = { new: 'contacted', contacted: 'booked', booked: 'closed', closed: 'new' };
+
+const ACTION_LABEL = { new: 'Contacted', contacted: 'Booked', booked: 'Closed', closed: 'Reopen' };
+const ACTION_STYLES = {
+  new:       'bg-amber-500/15 text-amber-400 ring-amber-500/25 hover:bg-amber-500/25',
+  contacted: 'bg-emerald-500/15 text-emerald-400 ring-emerald-500/25 hover:bg-emerald-500/25',
+  booked:    'bg-gray-500/15 text-gray-400 ring-gray-500/25 hover:bg-gray-500/25',
+  closed:    'bg-indigo-500/15 text-indigo-400 ring-indigo-500/25 hover:bg-indigo-500/25',
 };
 
-const NEXT_STATUS  = { new: 'contacted', contacted: 'booked', booked: 'closed', closed: 'new' };
-const STATUS_LABEL = { new: 'New', contacted: 'Contacted', booked: 'Booked', closed: 'Closed' };
+const CURRENT_LABEL = { new: 'New', contacted: 'Contacted', booked: 'Booked', closed: 'Closed' };
 
 function StatusPill({ status, onClick }) {
   return (
     <button
       onClick={onClick}
-      title="Click to advance status"
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ring-inset transition hover:opacity-80 ${STATUS_STYLES[status] ?? STATUS_STYLES.new}`}
+      title={`Mark as ${ACTION_LABEL[status]}`}
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ring-inset transition ${ACTION_STYLES[status] ?? ACTION_STYLES.new}`}
     >
-      {STATUS_LABEL[status] ?? status}
+      <span className="opacity-50">→</span>
+      {ACTION_LABEL[status] ?? 'Contacted'}
     </button>
   );
 }
@@ -45,6 +48,7 @@ function EnquiryCard({ enquiry, onDelete }) {
           <p className="truncate text-xs text-gray-500">{enquiry.email}</p>
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
+          <span className="text-[10px] font-medium text-gray-600">{CURRENT_LABEL[enquiry.status] ?? 'New'}</span>
           <StatusPill status={enquiry.status ?? 'new'} onClick={advanceStatus} />
           <button
             onClick={() => setOpen(o => !o)}
